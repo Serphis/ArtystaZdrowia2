@@ -47,38 +47,32 @@ export default function ProductList(){
     return (
       <main className="font-serif">
         <form method="post">
-          <div className="p-8 w-full rounded-md">
-            <h1 className="text-3xl">
-              Produkty
+          <div className="p-8 w-full rounded-md bg-[#f2e4ca]">
+            <h1 className="text-3xl flex justify-center font-light tracking-widest text-[#584d48]">
+              Nasze produkty
             </h1>
-            <div className="mt-4 p-10">
+            <div className="py-8">
               {products ? (
-                <div className="flex flex-row flex-wrap gap-5">
+                <div className="flex flex-row flex-wrap justify-center gap-5">
                   {products.map((Product: Product) => {
                     return (
                       <div key={Product.id}>
-                        <div className="flex flex-col ring-1 w-60 md:w-80 ring-slate-300 bg-slate-100 text-slate-600 rounded-sm shadow-md">
-                          <div className="flex flex-col items-center">
-                            <div className="mx-3 my-6">
-                              <img src={Product.image} alt="Opis zdjęcia" className='w-80 h-80 object-cover' />
-                            </div>
-                          </div>
-                          <div className="mx-3 my-1 mt-4 flex flex-col justify-left items-left">
-                            <div>
-                              {Product.name}
-                            </div>
-                            <div>Od 12 zł</div>
-                          </div>
-                          <div className="flex justify-start p-2">
+                        <div className="flex flex-col w-60 md:w-80">
                             <Link
-                              to={`/${Product.id}`}
-                              className="hover:bg-slate-600 bg-slate-800 text-white text-sm font-medium px-4 py-2 rounded-sm shadow-md"
-                            >
-                              Pokaż więcej
+                                to={`/${Product.id}`}
+                                className="hover:bg-[#d2c6af] text-[#f2e4ca] text-sm font-medium p-1 rounded-2xl"
+                                >
+                                <div className="flex flex-col items-center">
+                                    <div className="mx-3 pt-3 pb-2">
+                                    <img src={Product.image} alt="Opis zdjęcia" className='w-80 h-80 object-cover rounded-lg ring-1 ring-[#584d48]' />
+                                    </div>
+                                </div>
+                                <div className="text-center text-sm text-[#7b6b63] pt-2 px-2">
+                                {Product.name}
+                                </div>
                             </Link>
-                          </div>
                         </div>
-                      </div>
+                    </div>
                     );
                   })}
                 </div>
