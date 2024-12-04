@@ -22,9 +22,8 @@ const DefaultLayout: React.FC<{ children: React.ReactNode, userId: string | null
 
   return (
     <div className="min-h-screen flex flex-col font-tenor">
-      {/* HEADER */}
-      <header className="z-30 shadow-sm">
-        <div className="bg-[#7b6b63] sticky flex justify-center items-center p-2 px-8 space-x-10 text-[#f2e4ca] font-light tracking-widest sticky top-0">
+      <header className="z-30 shadow-sm sticky top-0">
+        <div className="bg-[#7b6b63] flex justify-center items-center p-2 px-8 space-x-10 text-[#f2e4ca] font-light tracking-widest">
           <Link to="/cart" className="group text-[#f2e4ca] transition duration-300 sm:text-sm lg:text-base">
             KOSZYK
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-[#f2e4ca] rounded-lg"></span>
@@ -38,7 +37,6 @@ const DefaultLayout: React.FC<{ children: React.ReactNode, userId: string | null
           </div>
         </div>
 
-        {/* Dolny pasek nawigacyjny */}
         <nav className="flex justify-center space-x-4 md:space-x-6 bg-[#f2e4ca] text-[#987867] p-2 text-xs sm:text-sm lg:text-base lg:text-normal font-light tracking-widest">
           <Link to="/" className="group text-[#987867] transition duration-300">
             Strona główna
@@ -72,10 +70,8 @@ const DefaultLayout: React.FC<{ children: React.ReactNode, userId: string | null
         
       </header>
 
-      {/* MAIN */}
       <main className="flex-grow">{children}</main>
 
-      {/* FOOTER */}
       <footer
         id="contact"
         className="flex justify-between items-center p-4 bg-[#7b6b63] text-[#f2e4ca] text-xs font-light"

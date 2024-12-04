@@ -25,9 +25,9 @@ export default function Index() {
           <h2 className="text-xl md:text-3xl lg:text-4xl text-center lg:tracking-wide p-4 sm:p-4 mb-2 sm:mb-10 lg:mb-24">W DOMOWYM ZACISZU</h2>
           <h2 className="text-l md:text-2xl lg:text-3xl text-center lg:tracking-wide p-3 sm:p-4">IDEALNY POMYSŁ NA PREZENT</h2>
         </div>
-        <div className="flex flex-col w-32 sm:w-48 md:w-56 lg:w-80 xl:w-96">
-          <img src="https://res.cloudinary.com/djio9fbja/image/upload/v1733048714/public/arxtmudlzzb186m0gvjp.jpg" alt="Opis zdjęcia" className='pr-4 sm:pr-12 object-cover' />
-          <img src="https://res.cloudinary.com/djio9fbja/image/upload/v1733048713/public/lzaavy3qk8ihcxtrucib.jpg" alt="Opis zdjęcia" className='pl-4 sm:pl-12 object-cover' />
+        <div className="flex flex-col w-36 sm:w-56 md:w-56 lg:w-80 xl:w-80">
+          <img src="https://res.cloudinary.com/djio9fbja/image/upload/v1733048714/public/arxtmudlzzb186m0gvjp.jpg" alt="Opis zdjęcia" className='pr-12 py-4 md:py-2 sm:pr-20 object-cover' />
+          <img src="https://res.cloudinary.com/djio9fbja/image/upload/v1733048713/public/lzaavy3qk8ihcxtrucib.jpg" alt="Opis zdjęcia" className='pl-12 sm:pl-20 object-cover' />
         </div>
       </section>
 

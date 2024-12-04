@@ -61,40 +61,49 @@ export default function Register() {
   };
 
   return (
-    <div className="h-full justify-center items-center flex flex-col gap-y-5">
-      <form method="POST" className="rounded-2xl bg-white p-6 w-96">
-        <h2 className="text-3xl font-extrabold text-black-600 mb-5">Stwórz konto</h2>
-        <Textfield
-          htmlFor="name"
-          type="text"
-          label="Imię"
-          value={formData.name}
-          onChange={e => handleInputChange(e, 'name')}
-          required
-        />
-        <Textfield
-          htmlFor="email"
-          label="Email"
-          value={formData.email}
-          onChange={e => handleInputChange(e, 'email')}
-          required
-        />
-        <Textfield
-          htmlFor="password"
-          type="password"
-          label="Hasło"
-          value={formData.password}
-          onChange={e => handleInputChange(e, 'password')}
-          required
-        />
-        <div className="w-full text-center mt-5">
-          <button type="submit" name="_action" value="Sign Up" className="w-full rounded-xl mt-2 bg-red-500 px-3 py-2 text-white font-semibold transition duration-300 ease-in-out hover:bg-red-600">
+    <div className="h-screen bg-[#f2e4ca]">
+      <div className="h-4/5 justify-center items-center flex flex-col">
+        <form method="POST" className="px-6 py-2 w-96">
+          <h2 className="text-3xl pb-6 text-[#584d48] font-light tracking-widest text-center">
             Stwórz konto
-          </button>
-        </div>
-      </form>
-      {actionData?.error && <p className="text-red-500">{actionData.error}</p>} {/* Wyświetlanie błędów */}
-      <p className="text-gray-600">Masz już konto? <Link to="/login"><span className="text-red-600 px-2 underline">Zaloguj się</span></Link></p>
+          </h2>
+          <Textfield
+            htmlFor="name"
+            type="text"
+            label="Imię"
+            value={formData.name}
+            onChange={e => handleInputChange(e, 'name')}
+            required
+          />
+          <Textfield
+            htmlFor="email"
+            label="Email"
+            value={formData.email}
+            onChange={e => handleInputChange(e, 'email')}
+            required
+          />
+          <Textfield
+            htmlFor="password"
+            type="password"
+            label="Hasło"
+            value={formData.password}
+            onChange={e => handleInputChange(e, 'password')}
+            required
+          />
+          <div className="w-full text-center pt-4 px-16">
+            <button type="submit" name="_action" value="Sign Up" className="w-full rounded-sm mt-3 px-3 py-2 font-semibold transition duration-300 ease-in-out bg-[#7b6b63] hover:bg-[#d1c1a5] text-[#f2e4ca] hover:text-[#7b6b63]">
+              Stwórz konto
+            </button>
+          </div>
+        </form>
+        <p className="text-[#7b6b63] px-2 pt-1">
+          Masz już konto?
+        </p>
+        {actionData?.error && <p className="text-red-500">{actionData.error}</p>}
+          <Link to="/login" className="group transition duration-300 ease-in-out text-[#7b6b63] hover:text-[#9a867c] px-2">
+            Zaloguj się
+          </Link>
+      </div>
     </div>
   );
 }

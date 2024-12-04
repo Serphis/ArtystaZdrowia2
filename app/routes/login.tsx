@@ -4,7 +4,7 @@ import { useActionData, Link, useLocation, Form } from "@remix-run/react";
 
 import { authenticator } from "../utils/auth.server";
 import { Textfield } from '../components/textfield';
-import { sessionStorage } from "../utils/session.server"; // zaimportowanie sessionStorage
+import { sessionStorage } from "../utils/session.server";
 import { prisma } from "../utils/prisma.server";
 import bcrypt from "bcryptjs";
 
@@ -15,16 +15,15 @@ export const meta: V2_MetaFunction = () => {
 
 export const loader: LoaderFunction = async ({ request }) => {
   try {
-    // Sprawdzanie, czy użytkownik jest zalogowany na podstawie sesji
     const session = await sessionStorage.getSession(request.headers.get("Cookie"));
     const userId = session.get("userId");
-    console.log("userId from session:", userId); // Logowanie userId
+    console.log("userId from session:", userId);
 
     if (userId) {
-      return redirect("/"); // Jeśli użytkownik jest zalogowany
+      return redirect("/");
     }
     
-    return null; // Jeśli użytkownik nie jest zalogowany, pozwól na dostęp do logowania
+    return null;
   } catch (error) {
     console.error("Loader error:", error);
     return redirect("/login");
@@ -41,7 +40,6 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   try {
-    // Pobierz użytkownika z bazy danych na podstawie emaila
     const user = await prisma.user.findUnique({
       where: { email },
     });
@@ -50,19 +48,16 @@ export const action: ActionFunction = async ({ request }) => {
       return json({ error: "Nieprawidłowy email lub hasło" }, { status: 401 });
     }
 
-    // Porównaj hasło z zahashowanym hasłem w bazie danych
     const passwordsMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordsMatch) {
       return json({ error: "Nieprawidłowy email lub hasło" }, { status: 401 });
     }
 
-    // Tworzenie sesji po poprawnym logowaniu
     const session = await sessionStorage.getSession();
     session.set("userId", user.id);
     session.set("email", user.email);
 
-    // Zwróć ciasteczko sesji wraz z przekierowaniem
     return redirect("/", {
       headers: {
         "Set-Cookie": await sessionStorage.commitSession(session),
@@ -81,10 +76,10 @@ export default function Login() {
 
   const actionData = useActionData();
 
-  const user = actionData?.user; // Upewnij się, że user jest poprawnie przypisany
+  const user = actionData?.user;
 
   console.log("actionData:", actionData);
-  console.log("Authenticated user:", user); // Sprawdź dane użytkownika
+  console.log("Authenticated user:", user);
 
   const [formData, setFormData] = useState({
     email: actionData?.fields?.email || '',
@@ -97,51 +92,60 @@ export default function Login() {
 
   useEffect(() => {
     if (user) {
-      window.location.href = "/"; // Przekierowanie na stronę główną, jeśli użytkownik jest zalogowany
+      window.location.href = "/";
     }
   }, [user]);
 
   return (
-    <div className="h-full justify-center bg-yellow-100 items-center flex flex-col gap-y-5">
-       {actionData?.error && (
-          <div className="bg-red-200 p-4 rounded-xl mb-4">
-            <p className="text-red-700">{actionData.error}</p>
+    <div className="h-screen bg-[#f2e4ca]">
+      <div className="h-4/5 justify-center items-center flex flex-col">
+        {actionData?.error && (
+            <div className="bg-red-200 p-4 rounded-xl">
+              <p className="text-red-700">{actionData.error}</p>
+            </div>
+          )}
+        {message && (
+          <div className="bg-green-200 p-4 rounded-xl">
+            <p className="text-green-700">{message}</p>
           </div>
         )}
-       {message && (
-        <div className="bg-green-200 p-4 rounded-xl mb-4">
-          <p className="text-green-700">{message}</p>
-        </div>
-      )}
-      <Form method="POST" className="rounded-2xl bg-white p-6 w-96">
-        <h2 className="text-3xl font-extrabold text-black-600 mb-5">Login</h2>
-        <Textfield
-          htmlFor="email"
-          label="Email"
-          value={formData.email}
-          onChange={e => handleInputChange(e, 'email')}
-          required
-        />
-        <Textfield
-          htmlFor="password"
-          type="password"
-          label="Hasło"
-          value={formData.password}
-          onChange={e => handleInputChange(e, 'password')}
-          required
-        />
-        <div className="w-full text-center mt-5">
-          <button 
-            type="submit" 
-            name="_action" 
-            value="Sign In" 
-            className="w-full rounded-xl mt-2 bg-red-500 px-3 py-2 text-white font-semibold transition duration-300 ease-in-out hover:bg-red-600"
-          >
+        <Form method="POST" className="px-6 py-2 w-96">
+          <h2 className="text-3xl pb-6 text-[#584d48] font-light tracking-widest text-center">
             Zaloguj się
-          </button>
-        </div>
-      </Form>
-      <p className="text-gray-600">Nie masz jeszcze konta?<Link to="/register"><span className="text-red-600 px-2 underline">Zarejestruj się</span></Link></p>
+          </h2>
+          <Textfield
+            htmlFor="email"
+            label="Email"
+            value={formData.email}
+            onChange={e => handleInputChange(e, 'email')}
+            required
+          />
+          <Textfield
+            htmlFor="password"
+            type="password"
+            label="Hasło"
+            value={formData.password}
+            onChange={e => handleInputChange(e, 'password')}
+            required
+          />
+          <div className="w-full text-center pt-4 px-28">
+            <button 
+              type="submit" 
+              name="_action" 
+              value="Sign In" 
+              className="w-full rounded-sm mt-3 px-3 py-2 font-semibold transition duration-300 ease-in-out bg-[#7b6b63] hover:bg-[#d1c1a5] text-[#f2e4ca] hover:text-[#7b6b63]"
+            >
+              Zaloguj się
+            </button>
+          </div>
+        </Form>
+        <p className="text-[#7b6b63] px-2 pt-1">
+          Nie masz jeszcze konta?
+        </p>
+        <Link to="/register" className="group transition duration-300 ease-in-out text-[#7b6b63] hover:text-[#9a867c] px-2">
+            Zarejestruj się
+        </Link>
+      </div>
     </div>
   );
 }

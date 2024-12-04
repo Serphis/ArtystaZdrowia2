@@ -4,13 +4,13 @@ interface FormFieldProps {
     type?: string;
     value: string;
     onChange?: (...args: any) => any;
-    required?: boolean;  // Dodanie typu required
+    required?: boolean;
   }
   
   export function Textfield({ htmlFor, label, type = 'text', value, onChange = () => {}, required = false }: FormFieldProps) {
     return (
       <>
-        <label htmlFor={htmlFor} className="text-gray-600 font-semibold">
+        <label htmlFor={htmlFor} className="text-[#584d48] font-normal tracking-widest">
           {label}
         </label>
         <input
@@ -18,9 +18,9 @@ interface FormFieldProps {
           type={type}
           id={htmlFor}
           name={htmlFor}
-          className="w-full p-2 rounded-xl my-2 border border-gray-300"
+          className="w-full p-1 my-2 rounded-md bg-[#f2e4ca] ring-1 ring-[#ad8c8c] shadow-md"
           value={value}
-          required={required}  // Dodanie atrybutu required
+          required={required}
         />
       </>
     );
