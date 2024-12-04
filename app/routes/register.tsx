@@ -91,7 +91,7 @@ export default function Register() {
             required
           />
           <div className="w-full text-center pt-4 px-16">
-            <button type="submit" name="_action" value="Sign Up" className="w-full rounded-sm mt-3 px-3 py-2 font-semibold transition duration-300 ease-in-out bg-[#7b6b63] hover:bg-[#d1c1a5] text-[#f2e4ca] hover:text-[#7b6b63]">
+            <button type="submit" name="_action" value="Sign Up" className="w-full rounded-sm mt-3 px-3 py-2 font-semibold transition duration-300 ease-in-out bg-[#7b6b63] hover:bg-[#fbf7ed] text-[#fbf7ed] hover:text-[#7b6b63]">
               Stwórz konto
             </button>
           </div>

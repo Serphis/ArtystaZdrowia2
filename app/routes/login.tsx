@@ -133,7 +133,7 @@ export default function Login() {
               type="submit" 
               name="_action" 
               value="Sign In" 
-              className="w-full rounded-sm mt-3 px-3 py-2 font-semibold transition duration-300 ease-in-out bg-[#7b6b63] hover:bg-[#d1c1a5] text-[#f2e4ca] hover:text-[#7b6b63]"
+              className="w-full rounded-sm mt-3 px-3 py-2 font-semibold transition duration-300 ease-in-out bg-[#7b6b63] hover:bg-[#fbf7ed] text-[#fbf7ed] hover:text-[#7b6b63]"
             >
               Zaloguj się
             </button>

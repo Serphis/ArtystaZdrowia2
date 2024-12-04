@@ -18,7 +18,7 @@ interface FormFieldProps {
           type={type}
           id={htmlFor}
           name={htmlFor}
-          className="w-full p-1 my-2 rounded-md bg-[#f2e4ca] ring-1 ring-[#ad8c8c] shadow-md"
+          className="w-full p-1 my-2 rounded-md bg-[#fbf7ed] ring-1 ring-[#ad8c8c] shadow-md"
           value={value}
           required={required}
         />
