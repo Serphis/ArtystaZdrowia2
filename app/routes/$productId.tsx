@@ -66,7 +66,7 @@ export default function ProductInfo() {
                         <form
                             method="post"
                             action={`/cart`} >
-                            <input type="hidden" name="productId" value={productId} />
+                            <input type="hidden" name="productId" value={Product.id} />
                             <div className="flex justify-center pt-8 md:pt-14">
                                 <label htmlFor="quantity" className="block text-sm font-light tracking-widest pb-1">
                                     Ilość

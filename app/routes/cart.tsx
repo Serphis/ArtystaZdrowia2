@@ -63,7 +63,6 @@ export default function Cart() {
 
   const updatedCart = cartItems.map((item) => {
     const product = products.find((p) => p.id === item.productId);
-  
     const size = sizes.find((s) => s.id === item.sizeId);
 
     return {
@@ -75,9 +74,22 @@ export default function Cart() {
     };
   });
 
+  const handleUpdateQuantity = async (productId, sizeId, action) => {
+    const formData = new FormData();
+    formData.append("productId", productId);
+    formData.append("sizeId", sizeId);
+    formData.append("actionType", action);
+
+    await fetch("/cart", {
+      method: "POST",
+      body: formData,
+    });
+    
+    window.location.reload();
+  };
 
   return (
-    <main className="h-screen p-4 bg-[#f2e4ca] font-light">
+    <main className="min-h-screen p-4 bg-[#f2e4ca] font-light">
       <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-widest text-center px-2 pt-4 pb-8">
         Koszyk
       </h1>
