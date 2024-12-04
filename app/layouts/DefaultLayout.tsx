@@ -44,26 +44,26 @@ const DefaultLayout: React.FC<{ children: React.ReactNode, userId: string | null
             Strona główna
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-[#987867]"></span>
           </Link>
-          <Link to="/about" className="group text-[#987867] transition duration-300">
+          {/* <Link to="/about" className="group text-[#987867] transition duration-300">
             O firmie
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-[#987867]"></span>
-          </Link>
+          </Link> */}
           <Link to="/productList" className="group text-[#987867] transition duration-300">
             Produkty
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-[#987867]"></span>
           </Link>
-          <Link to="/treatments" className="group text-[#987867] transition duration-300">
+          {/* <Link to="/treatments" className="group text-[#987867] transition duration-300">
             Zabiegi
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-[#987867]"></span>
-          </Link>
-          <Link to="/dogotherapy" className="group text-[#987867] transition duration-300">
+          </Link> */}
+          {/* <Link to="/dogotherapy" className="group text-[#987867] transition duration-300">
             Dogoterapia
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-[#987867]"></span>
-          </Link>
-          <Link to="/felinotherapy" className="group text-[#987867] transition duration-300">
+          </Link> */}
+          {/* <Link to="/felinotherapy" className="group text-[#987867] transition duration-300">
             Felinoterapia
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-[#987867]"></span>
-          </Link>
+          </Link> */}
           <Link to="/contact" className="group text-[#987867] transition duration-300">
             Kontakt
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-[#987867]"></span>
