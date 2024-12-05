@@ -1,34 +1,74 @@
 import { useLoaderData } from "@remix-run/react";
 import { db } from "../services/index";
-import { ActionFunction, LoaderFunction, json, redirect } from "@remix-run/node";
+import { ActionFunction, LoaderFunction, MaxPartSizeExceededError, json, redirect } from "@remix-run/node";
 import { getSession, commitSession, addToCart } from "../utils/session.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
-  const cart = session.get("cart") || [];
+  const cart = session.get("cart") || {};
   const products = await db.product.findMany();
   const sizes = await db.size.findMany();
+  const keys = Object.keys(cart)
+  
+  const matchedItems = {};  // Obiekt, który przechowa dopasowane produkty z rozmiarami i cenami
 
-  if (cart.length === 0) {
-    return json({ cart: [], message: "Koszyk jest pusty." });
+  for (const key in cart) {
+    for (const productKey in products) {
+      // Dopasowanie produktów
+      if (key === products[productKey].id) {
+        const productId = products[productKey].id;
+        
+        // Inicjalizujemy obiekt, jeśli jeszcze nie istnieje
+        if (!matchedItems[productId]) {
+          matchedItems[productId] = {
+            productId: productId,
+            name: products[productKey].name,
+            image: products[productKey].image,
+            sizeName: null,
+            sizePrice: null,
+            quantity: cart[key].quantity || 1  // Ilość z koszyka
+          };
+        }
+        
+        // Dopasowanie rozmiaru i ceny
+        const matchedSize = sizes.find(size => size.id === cart[key].sizeId);
+        // console.log("BBBBBBBBBBBBBBB", matchedSize)
+        if (matchedSize) {
+          matchedItems[productId].sizeName = matchedSize.name;
+          matchedItems[productId].sizePrice = matchedSize.price;  // Cena rozmiaru
+        }
+      }
+    }
   }
 
-  const enhancedCart = await Promise.all(
-    cart.map(async (item) => {
-      const product = await db.product.findUnique({
-        where: { id: item.productId },
-        select: { name: true, image: true },
-      });
+  if (Object.keys(cart).length === 0) {
+    return json({ cart: {}, message: "Koszyk jest pusty." });
+  }
 
-      return {
-        ...item,
-        name: product?.name || "Nieznany produkt",
-        image: product?.image || "/placeholder.jpg",
-      };
-    })
-  );
+  return json({ matchedItems, session, products, sizes });
 
-  return { cart: enhancedCart, products, sizes };
+  // const enhancedCart = await Promise.all(
+  //   Object.keys(cart).map(async (key) => {
+  //     const item = cart[key];
+  //     const product = await db.product.findUnique({
+  //       where: id = item.productId,
+  //       select: { name: true, image: true },
+  //     });
+
+  //     return {
+  //       ...item,
+  //       name: product?.name || "Nieznany produkt",
+  //       image: product?.image || "/placeholder.jpg",
+  //     };
+  //   })
+  // );
+
+  // const enhancedCartDict = enhancedCart.reduce((acc, item) => {
+  //   acc[`${item.productId}-${item.sizeId}`] = item;
+  //   return acc;
+  // }, {} as Record<string, any>);
+
+  // return { cart: enhancedCartDict, products, sizes };
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -57,45 +97,18 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function Cart() {
-  const { cart, message, products, sizes } = useLoaderData();
+  const { matchedItems, message } = useLoaderData();  // Odbieramy matchedItems z loadera
 
-  const cartItems = Array.isArray(cart) ? cart : [];
-
-  const updatedCart = cartItems.map((item) => {
-    const product = products.find((p) => p.id === item.productId);
-    const size = sizes.find((s) => s.id === item.sizeId);
-
-    return {
-      ...item,
-      productName: product ? product.name : "Nieznany produkt",
-      productImage: product ? product.image : "/placeholder.jpg",
-      sizeName: size ? size.name : "Nieznany rozmiar",
-      sizePrice: size ? size.price : 0,
-    };
-  });
-
-  const handleUpdateQuantity = async (productId, sizeId, action) => {
-    const formData = new FormData();
-    formData.append("productId", productId);
-    formData.append("sizeId", sizeId);
-    formData.append("actionType", action);
-
-    await fetch("/cart", {
-      method: "POST",
-      body: formData,
-    });
-    
-    window.location.reload();
-  };
+  console.log("AAAAAAAAAAAAAa", matchedItems)
 
   return (
     <main className="min-h-screen p-4 bg-[#f2e4ca] font-light">
       <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-widest text-center px-2 pt-4 pb-8">
         Koszyk
       </h1>
-      {updatedCart.length > 0 ? (
+      {Object.keys(matchedItems).length > 0 ? (  // Sprawdzamy, czy są dopasowane produkty
         <div className="space-y-4 sm:mx-10 md:mx-16 lg:mx-52 xl:mx-72">
-          {updatedCart.map((item, index) => (
+          {Object.values(matchedItems).map((item, index) => (
             <div
               key={index}
               className="flex items-center justify-between bg-[#fbf7ed] shadow-lg ring-1 ring-[#b5a589] p-4 rounded-2xl"

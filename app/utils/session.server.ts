@@ -54,18 +54,20 @@ export async function addToCart(session: any, productId: string, quantity: numbe
     where: { id: productId },
     select: { name: true, image: true },
   });
-  
-  const cart = session.get("cart") || [];
-  const existingProductIndex = cart.findIndex((item) => item.productId === productId && item.sizeId === sizeId);
 
-  if (existingProductIndex !== -1) {
-    cart[existingProductIndex].quantity += quantity;
+  const cart: Record<string, { quantity: number; name: string; image: string; sizeId: string; price: number }> = session.get("cart") || {};
+
+  const productKey = `${productId}`;
+
+  if (cart[productKey]) {
+    cart[productKey].quantity += quantity;
   } else {
-    cart.push({ productId, quantity, name:product.name, image: product.image, sizeId, price });
+    cart[productKey] = { quantity, name: product.name, image: product.image, sizeId, price };
   }
 
   session.set("cart", cart);
 }
+
 
 export async function removeFromCart(session: Session, productId: string, sizeId: string) {
   const cart = session.get("cart") || [];
