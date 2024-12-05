@@ -73,8 +73,25 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
-
   const productId = formData.get("productId")?.toString();
+  const actionType = formData.get("action")?.toString(); // Typ akcji: "delete"
+  
+  const session = await getSession(request);
+
+  if (actionType === "delete" && productId) {
+    const cart = session.get("cart") || {};
+    delete cart[productId]; // Usuwamy produkt z koszyka
+    session.set("cart", cart);
+    const commit = await commitSession(session);
+
+    return redirect("/cart", {
+      headers: {
+        "Set-Cookie": commit,
+      },
+    });
+  }
+
+  // Obsługa dodawania
   const sizeId = formData.get("size")?.toString();
   const quantity = parseInt(formData.get("quantity")?.toString() || "1", 10);
   const price = parseFloat(formData.get("price")?.toString() || "0");
@@ -83,10 +100,7 @@ export const action: ActionFunction = async ({ request }) => {
     console.warn("Brakuje danych w formularzu lub dane są nieprawidłowe.");
   }
 
-  const session = await getSession(request);
-
   await addToCart(session, productId, quantity, sizeId, price);
-
   const commit = await commitSession(session);
 
   return redirect("/cart", {
@@ -102,44 +116,54 @@ export default function Cart() {
   console.log("AAAAAAAAAAAAAa", matchedItems)
 
   return (
-    <main className="min-h-screen p-4 bg-[#f2e4ca] font-light">
-      <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-widest text-center px-2 pt-4 pb-8">
-        Koszyk
-      </h1>
-      {Object.keys(matchedItems).length > 0 ? (  // Sprawdzamy, czy są dopasowane produkty
-        <div className="space-y-4 sm:mx-10 md:mx-16 lg:mx-52 xl:mx-72">
-          {Object.values(matchedItems).map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between bg-[#fbf7ed] shadow-lg ring-1 ring-[#b5a589] p-4 rounded-2xl"
-            >
-              <div className="flex items-center space-x-4">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-2xl ring-1 ring-[#b5a589]"
-                />
-                <span className="text-lg md:text-xl font-medium tracking-widest">
-                  {item.name}
-                </span>
+    <form method="post">
+      <main className="min-h-screen p-4 bg-[#f2e4ca] font-light">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-widest text-center px-2 pt-4 pb-8">
+          Koszyk
+        </h1>
+        {Object.keys(matchedItems).length > 0 ? (  // Sprawdzamy, czy są dopasowane produkty
+          <div className="space-y-4 sm:mx-10 md:mx-16 lg:mx-52 xl:mx-72">
+            {Object.values(matchedItems).map((item, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between bg-[#fbf7ed] shadow-lg ring-1 ring-[#b5a589] p-4 rounded-2xl"
+              >
+                <div className="flex items-center space-x-4">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-2xl ring-1 ring-[#b5a589]"
+                  />
+                  <span className="text-lg md:text-xl font-medium tracking-widest">
+                    {item.name}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg md:text-xl font-bold">{item.sizePrice} zł</p>
+                  <p className="text-sm md:text-base text-[#7b6b63]">
+                    Ilość: {item.quantity}
+                  </p>
+                  <p className="text-sm md:text-base text-[#7b6b63]">
+                    Rozmiar: {item.sizeName}
+                  </p>
+                  <input type="hidden" name="productId" value={item.productId} />
+                  <input type="hidden" name="action" value="delete" />
+                  <button
+                    type="submit"
+                    className="text-red-600 hover:underline text-sm md:text-base"
+                  >
+                    Usuń
+                  </button>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-lg md:text-xl font-bold">{item.sizePrice} zł</p>
-                <p className="text-sm md:text-base text-[#7b6b63]">
-                  Ilość: {item.quantity}
-                </p>
-                <p className="text-sm md:text-base text-[#7b6b63]">
-                  Rozmiar: {item.sizeName}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-[#7b6b63] text-center tracking-widest mt-6">
-          {message || "Twój koszyk jest pusty."}
-        </p>
-      )}
-    </main>
+            ))}
+          </div>
+        ) : (
+          <p className="text-[#7b6b63] text-center tracking-widest mt-6">
+            {message || "Twój koszyk jest pusty."}
+          </p>
+        )}
+      </main>
+    </form>
   );
 }
