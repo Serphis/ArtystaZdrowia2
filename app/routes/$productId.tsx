@@ -50,14 +50,14 @@ export default function ProductInfo() {
   };
 
   return (
-    <main className="h-screen font-light bg-[#f2e4ca]">
+    <main className="h-screen font-light">
         <div key={Product.id} className="w-full rounded-md">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-widest text-center p-2 pt-4">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-widest text-center p-2 pt-6">
                 {Product.name}
             </h1>
-            <div className="flex flex-row my-6 space-x-4 sm:space-x-6 md:space-x-6 sm:mx-14 md:mx-16 lg:mx-30 xl:mx-40 justify-center mb-4">
-                <img src={Product.image} alt={Product.name} className="object-cover w-52 sm:w-64 md:w-80 lg:w-96 rounded-2xl ring-1 ring-[#b5a589]" />
-                <div className="flex flex-col py-8 rounded-2xl ring-1 ring-[#b5a589]">
+            <div className="flex flex-row my-6 space-x-4 sm:space-x-6 md:space-x-12 lg:space-x-16 mx-4 sm:mx-14 md:mx-16 lg:mx-30 xl:mx-40 justify-center mb-4">
+                <img src={Product.image} alt={Product.name} className="object-cover w-52 sm:w-64 md:w-80 rounded-2xl ring-1 ring-black" />
+                <div className="flex flex-col py-8 rounded-2xl ring-1 ring-black">
                     <div className="py-4">
                         <p className="px-8 text-justify tracking-widest max-w-96 text-xs md:text-sm md:text-lg">
                             {Product.description}
@@ -81,7 +81,7 @@ export default function ProductInfo() {
                                     value={quantity}
                                     min="1"
                                     onChange={(e) => setQuantity(e.target.value)}
-                                    className="rounded p-1 w-12 text-center ring-1 ring-[#b5a589] shadow-lg bg-[#fbf7ed]"
+                                    className="rounded p-1 w-12 text-center ring-1 ring-black shadow-lg"
                                 />
                             </div>
                             <div className="flex justify-center">
@@ -94,7 +94,7 @@ export default function ProductInfo() {
                                     id="size"
                                     name="size"
                                     onChange={handleSizeChange}
-                                    className="ring-1 ring-[#b5a589] shadow-lg rounded p-2 w-40 bg-[#fbf7ed]"
+                                    className="ring-1 ring-black shadow-lg rounded p-2 w-40"
                                 >
                                     {sizes.map((size) => (
                                     <option key={size.id} value={size.id}>
@@ -105,7 +105,7 @@ export default function ProductInfo() {
                             </div>
                             
                             <div className="flex justify-center pt-4 md:pt-6">
-                                <button type="submit" className="ring-1 ring-[#b5a589] shadow-lg transition duration-500 ease-in-out bg-[#7b6b63] hover:bg-[#fbf7ed] text-[#fbf7ed] hover:text-[#7b6b63] rounded p-2 w-36">Dodaj do koszyka</button>
+                                <button type="submit" className="ring-1 ring-black shadow-lg transition duration-500 ease-in-out hover:bg-slate-100 hover:text-slate-800 rounded p-2 w-36">Dodaj do koszyka</button>
                             </div>
                         </form>
                     </div>

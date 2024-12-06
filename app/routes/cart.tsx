@@ -109,7 +109,7 @@ export default function Cart() {
 
   return (
     <form method="post">
-      <main className="min-h-screen p-4 bg-[#f2e4ca] font-light">
+      <main className="min-h-screen p-4 font-light">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-widest text-center px-2 pt-4 pb-8">
           Koszyk
         </h1>
@@ -119,7 +119,7 @@ export default function Cart() {
                 <input type="hidden" name="action" value="clear" />
                 <button
                   type="submit"
-                  className="group transition duration-300 ease-in-out text-[#7b6b63] hover:text-[#9a867c] px-2"
+                  className="group transition duration-300 ease-in-out hover:text-slate-600 px-2 py-2"
                 >
                   Wyczyść koszyk
                 </button>
@@ -127,13 +127,13 @@ export default function Cart() {
             {Object.values(matchedItems).map((item, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between bg-[#fbf7ed] shadow-lg ring-1 ring-[#b5a589] p-4 rounded-2xl"
+                className="flex items-center justify-between shadow-lg ring-1 ring-black p-4 rounded-2xl"
               >
                 <div className="flex items-center space-x-4">
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-2xl ring-1 ring-[#b5a589]"
+                    className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-2xl ring-1 ring-black"
                   />
                   <span className="text-lg md:text-xl font-medium tracking-widest">
                     {item.name}
@@ -141,10 +141,10 @@ export default function Cart() {
                 </div>
                 <div className="text-right">
                   <p className="text-lg md:text-xl font-bold">{item.sizePrice} zł</p>
-                  <p className="text-sm md:text-base text-[#7b6b63]">
+                  <p className="text-sm md:text-base">
                     Ilość: {item.quantity}
                   </p>
-                  <p className="text-sm md:text-base text-[#7b6b63]">
+                  <p className="text-sm md:text-base">
                     Rozmiar: {item.sizeName}
                   </p>
                 </div>
@@ -152,7 +152,7 @@ export default function Cart() {
             ))}
           </div>
         ) : (
-          <p className="text-[#7b6b63] text-center tracking-widest mt-6">
+          <p className="text-center tracking-widest mt-6">
             {message || "Twój koszyk jest pusty."}
           </p>
         )}

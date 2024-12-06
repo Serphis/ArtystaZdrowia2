@@ -37,18 +37,18 @@ const DefaultLayout: React.FC<{ children: React.ReactNode, userId: string | null
           </div>
         </div>
 
-        <nav className="flex justify-center space-x-4 md:space-x-6 bg-[#f2e4ca] text-[#987867] p-2 text-xs sm:text-sm lg:text-base lg:text-normal font-light tracking-widest">
-          <Link to="/" className="group text-[#987867] transition duration-300">
+        <nav className="flex justify-center space-x-4 md:space-x-6 bg-white p-2 text-xs sm:text-sm lg:text-base lg:text-normal font-light tracking-widest">
+          <Link to="/" className="group transition duration-300">
             Strona główna
-            <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-[#987867]"></span>
+            <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-black"></span>
           </Link>
           {/* <Link to="/about" className="group text-[#987867] transition duration-300">
             O firmie
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-[#987867]"></span>
           </Link> */}
-          <Link to="/productList" className="group text-[#987867] transition duration-300">
+          <Link to="/productList" className="group transition duration-300">
             Produkty
-            <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-[#987867]"></span>
+            <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-black"></span>
           </Link>
           {/* <Link to="/treatments" className="group text-[#987867] transition duration-300">
             Zabiegi
@@ -62,15 +62,15 @@ const DefaultLayout: React.FC<{ children: React.ReactNode, userId: string | null
             Felinoterapia
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-[#987867]"></span>
           </Link> */}
-          <Link to="/contact" className="group text-[#987867] transition duration-300">
+          {/* <Link to="/contact" className="group transition duration-300">
             Kontakt
-            <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-[#987867]"></span>
-          </Link>
+            <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-black"></span>
+          </Link> */}
         </nav>
         
       </header>
 
-      <main className="flex-grow">{children}</main>
+      <main className="flex-grow text-black">{children}</main>
 
       <footer
         id="contact"

@@ -61,10 +61,10 @@ export default function Register() {
   };
 
   return (
-    <div className="h-screen bg-[#f2e4ca]">
+    <div className="h-screen">
       <div className="h-4/5 justify-center items-center flex flex-col">
         <form method="POST" className="px-6 py-2 w-96">
-          <h2 className="text-3xl pb-6 text-[#584d48] font-light tracking-widest text-center">
+          <h2 className="text-3xl pb-6 font-light tracking-widest text-center">
             Stwórz konto
           </h2>
           <Textfield
@@ -91,16 +91,16 @@ export default function Register() {
             required
           />
           <div className="w-full text-center pt-4 px-16">
-            <button type="submit" name="_action" value="Sign Up" className="w-full rounded-sm mt-3 px-3 py-2 font-semibold transition duration-300 ease-in-out bg-[#7b6b63] hover:bg-[#fbf7ed] text-[#fbf7ed] hover:text-[#7b6b63]">
+            <button type="submit" name="_action" value="Sign Up" className="ring-1 ring-black rounded-sm mt-3 px-3 py-2 font-semibold transition duration-300 ease-in-out hover:bg-slate-100 hover:text-slate-800">
               Stwórz konto
             </button>
           </div>
         </form>
-        <p className="text-[#7b6b63] px-2 pt-1">
+        <p className="px-2 pt-1">
           Masz już konto?
         </p>
         {actionData?.error && <p className="text-red-500">{actionData.error}</p>}
-          <Link to="/login" className="group transition duration-300 ease-in-out text-[#7b6b63] hover:text-[#9a867c] px-2">
+          <Link to="/login" className="group transition duration-300 ease-in-out hover:text-slate-600 px-2 py-1">
             Zaloguj się
           </Link>
       </div>
