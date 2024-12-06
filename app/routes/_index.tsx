@@ -19,7 +19,7 @@ const HorizontalLine: React.FC<{ width: string }> = ({ width }) => {
 export default function Index() {
   return (
     <div className="bg-white font-light tracking-widest">
-              <section className="text-center pt-12 flex flex-row justify-center">
+      <section className="text-center pt-12 flex flex-row justify-center">
         <div className="p-2 sm:py-8 flex flex-col sm:mr-12 lg:mr-28 xl:mr-40">
           <h2 className="text-2xl md:text-4xl lg:text-5xl text-center lg:tracking-wide p-4 sm:p-4 mb-2 sm:mb-10 lg:mb-32">RĘCZNIE ROBIONE ŚWIECE</h2>
           <h2 className="text-xl md:text-3xl lg:text-4xl text-center lg:tracking-wide p-4 sm:p-4 mb-2 sm:mb-10 lg:mb-24">W DOMOWYM ZACISZU</h2>
