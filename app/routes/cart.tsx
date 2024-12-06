@@ -8,80 +8,54 @@ export const loader: LoaderFunction = async ({ request }) => {
   const cart = session.get("cart") || {};
   const products = await db.product.findMany();
   const sizes = await db.size.findMany();
-  const keys = Object.keys(cart)
   
   const matchedItems = {};  // Obiekt, który przechowa dopasowane produkty z rozmiarami i cenami
 
   for (const key in cart) {
     for (const productKey in products) {
-      // Dopasowanie produktów
-      if (key === products[productKey].id) {
+      const uniqueKey = `${products[productKey].id}-${cart[key].sizeId}`;
+      
+      if (key === uniqueKey) {
         const productId = products[productKey].id;
-        
-        // Inicjalizujemy obiekt, jeśli jeszcze nie istnieje
-        if (!matchedItems[productId]) {
-          matchedItems[productId] = {
+
+        if (!matchedItems[uniqueKey]) {
+          matchedItems[uniqueKey] = {
             productId: productId,
             name: products[productKey].name,
             image: products[productKey].image,
+            sizeId: null,
             sizeName: null,
             sizePrice: null,
-            quantity: cart[key].quantity || 1  // Ilość z koszyka
+            quantity: cart[key].quantity || 1
           };
         }
-        
-        // Dopasowanie rozmiaru i ceny
+
         const matchedSize = sizes.find(size => size.id === cart[key].sizeId);
-        // console.log("BBBBBBBBBBBBBBB", matchedSize)
+
         if (matchedSize) {
-          matchedItems[productId].sizeName = matchedSize.name;
-          matchedItems[productId].sizePrice = matchedSize.price;  // Cena rozmiaru
+          matchedItems[uniqueKey].sizeId = matchedSize.id;
+          matchedItems[uniqueKey].sizeName = matchedSize.name;
+          matchedItems[uniqueKey].sizePrice = matchedSize.price;
         }
       }
     }
   }
+
 
   if (Object.keys(cart).length === 0) {
     return json({ cart: {}, message: "Koszyk jest pusty." });
   }
 
   return json({ matchedItems, session, products, sizes });
-
-  // const enhancedCart = await Promise.all(
-  //   Object.keys(cart).map(async (key) => {
-  //     const item = cart[key];
-  //     const product = await db.product.findUnique({
-  //       where: id = item.productId,
-  //       select: { name: true, image: true },
-  //     });
-
-  //     return {
-  //       ...item,
-  //       name: product?.name || "Nieznany produkt",
-  //       image: product?.image || "/placeholder.jpg",
-  //     };
-  //   })
-  // );
-
-  // const enhancedCartDict = enhancedCart.reduce((acc, item) => {
-  //   acc[`${item.productId}-${item.sizeId}`] = item;
-  //   return acc;
-  // }, {} as Record<string, any>);
-
-  // return { cart: enhancedCartDict, products, sizes };
 };
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
-  const productId = formData.get("productId")?.toString();
-  const actionType = formData.get("action")?.toString(); // Typ akcji: "delete"
-  
+  const actionType = formData.get("action")?.toString(); // Typ akcji: "clear" lub inny
   const session = await getSession(request);
 
-  if (actionType === "delete" && productId) {
-    const cart = session.get("cart") || {};
-    delete cart[productId]; // Usuwamy produkt z koszyka
-    session.set("cart", cart);
+  if (actionType === "clear") {
+    session.set("cart", {}); // Usuwamy wszystkie dane z koszyka
     const commit = await commitSession(session);
 
     return redirect("/cart", {
@@ -91,7 +65,25 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
+  // Obsługa usuwania pojedynczego produktu - Zostawiona jako komentarz
+  /*
+  const productId = formData.get("productId")?.toString();
+  if (actionType === "delete" && productId) {
+    const cart = session.get("cart") || {};
+    delete cart[productId];
+    session.set("cart", cart);
+    const commit = await commitSession(session);
+
+    return redirect("/cart", {
+      headers: {
+        "Set-Cookie": commit,
+      },
+    });
+  }
+  */
+
   // Obsługa dodawania
+  const productId = formData.get("productId")?.toString();
   const sizeId = formData.get("size")?.toString();
   const quantity = parseInt(formData.get("quantity")?.toString() || "1", 10);
   const price = parseFloat(formData.get("price")?.toString() || "0");
@@ -111,9 +103,9 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function Cart() {
-  const { matchedItems, message } = useLoaderData();  // Odbieramy matchedItems z loadera
+  const { matchedItems = {}, message } = useLoaderData();  // Odbieramy matchedItems z loadera
 
-  console.log("AAAAAAAAAAAAAa", matchedItems)
+  const isCartEmpty = !matchedItems || Object.keys(matchedItems).length === 0;
 
   return (
     <form method="post">
@@ -121,8 +113,17 @@ export default function Cart() {
         <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-widest text-center px-2 pt-4 pb-8">
           Koszyk
         </h1>
-        {Object.keys(matchedItems).length > 0 ? (  // Sprawdzamy, czy są dopasowane produkty
-          <div className="space-y-4 sm:mx-10 md:mx-16 lg:mx-52 xl:mx-72">
+        {!isCartEmpty ? ( // Jeśli koszyk nie jest pusty
+            <div className="space-y-4 sm:mx-10 md:mx-16 lg:mx-52 xl:mx-72">
+              <div className="flex justify-center">
+                <input type="hidden" name="action" value="clear" />
+                <button
+                  type="submit"
+                  className="group transition duration-300 ease-in-out text-[#7b6b63] hover:text-[#9a867c] px-2"
+                >
+                  Wyczyść koszyk
+                </button>
+              </div>
             {Object.values(matchedItems).map((item, index) => (
               <div
                 key={index}
@@ -146,14 +147,6 @@ export default function Cart() {
                   <p className="text-sm md:text-base text-[#7b6b63]">
                     Rozmiar: {item.sizeName}
                   </p>
-                  <input type="hidden" name="productId" value={item.productId} />
-                  <input type="hidden" name="action" value="delete" />
-                  <button
-                    type="submit"
-                    className="text-red-600 hover:underline text-sm md:text-base"
-                  >
-                    Usuń
-                  </button>
                 </div>
               </div>
             ))}

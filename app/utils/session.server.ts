@@ -57,7 +57,7 @@ export async function addToCart(session: any, productId: string, quantity: numbe
 
   const cart: Record<string, { quantity: number; name: string; image: string; sizeId: string; price: number }> = session.get("cart") || {};
 
-  const productKey = `${productId}`;
+  const productKey = `${productId}-${sizeId}`;  // np. "123-1" (gdzie 123 to productId, a 1 to sizeId)
 
   if (cart[productKey]) {
     cart[productKey].quantity += quantity;
@@ -71,10 +71,14 @@ export async function addToCart(session: any, productId: string, quantity: numbe
 
 export async function removeFromCart(session: Session, productId: string, sizeId: string) {
   const cart = session.get("cart") || [];
-  const updatedCart = cart.filter((item: any) => item.productId !== productId && item.sizeId === sizeId);
+  
+  const uniqueKey = `${productId}-${sizeId}`;
+
+  const updatedCart = cart.filter((item: any) => `${item.productId}-${item.sizeId}` !== uniqueKey);
   
   session.set("cart", updatedCart);
 }
+
 
 
 export { sessionStorage };

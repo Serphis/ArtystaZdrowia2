@@ -21,10 +21,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 export const action: ActionFunction = async ({ request, params }) => {
   const formData = await request.formData();
 
-  const productId = params.toString();
-  const sizeId = formData.get("sizeId")?.toString();
-  const quantity = parseInt(formData.get("quantity")?.toString() || "1");
-  const price = parseFloat(formData.get("price")?.toString() || "0");
+  const productId = params.productId.toString();  // Zmieniamy na odpowiednią nazwę parametru, np. "productId"
+  const sizeId = formData.get("sizeId")?.toString();  // Pobieramy sizeId z formularza
+  const quantity = parseInt(formData.get("quantity")?.toString() || "1");  // Ilość produktów (domyślnie 1)
+  const price = parseFloat(formData.get("price")?.toString() || "0");  // Cena rozmiaru (domyślnie 0)
+
 
   const session = await getSession(request);
   await addToCart(session, productId, quantity, sizeId, price);
