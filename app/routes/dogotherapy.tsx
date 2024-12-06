@@ -4,7 +4,7 @@ export default function Index() {
   return (
     <div className="bg-white font-light tracking-wide mx-4 sm:mx-14 md:mx-24 lg:mx-40 xl:mx-60">
         <div className="text-center flex flex-col">
-            <h2 className="text-4xl md:text-5xl text-center my-10 mb-12">Dogoterapia</h2>
+            <h2 className="text-5xl text-center my-10 mb-12">Dogoterapia</h2>
 
             <div className="px-8 text-justify">
             <h3 className="text-xl px-4 py-1">- Spotkania z psem indywidualne <strong>150 zł</strong></h3>

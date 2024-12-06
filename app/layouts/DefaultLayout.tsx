@@ -37,15 +37,15 @@ const DefaultLayout: React.FC<{ children: React.ReactNode, userId: string | null
           </div>
         </div>
 
-        <nav className="bg-white flex justify-center space-x-4 md:space-x-6 p-2 text-sm sm:text-base font-light tracking-widest">
+        <nav className="bg-white flex justify-center space-x-2 md:space-x-6 py-2 p-1 sm:p-2 text-xs md:text-base font-light tracking-widest">
           <Link to="/" className="group transition duration-300">
             Strona główna
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-black"></span>
           </Link>
-          {/* <Link to="/about" className="group transition duration-300">
+          <Link to="/about" className="group transition duration-300">
             O firmie
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-black"></span>
-          </Link> */}
+          </Link>
           <Link to="/productList" className="group transition duration-300">
             Produkty
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-black"></span>
