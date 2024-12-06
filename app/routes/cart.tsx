@@ -65,6 +65,30 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
+  if (actionType === "createOrder") {
+    const cart = session.get("cart") || {};
+    // Logika tworzenia zamówienia, np. zapis do bazy danych
+    await db.order.create({
+      data: {
+        items: Object.values(cart).map(item => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          sizeId: item.sizeId,
+          price: item.price,
+        })),
+      },
+    });
+  
+    session.set("cart", {});  // Wyczyść koszyk po złożeniu zamówienia
+    const commit = await commitSession(session);
+  
+    return redirect("/order-success", {
+      headers: {
+        "Set-Cookie": commit,
+      },
+    });
+  }
+
   // Obsługa usuwania pojedynczego produktu - Zostawiona jako komentarz
   /*
   const productId = formData.get("productId")?.toString();
@@ -156,6 +180,15 @@ export default function Cart() {
             {message || "Twój koszyk jest pusty."}
           </p>
         )}
+        <div className="flex justify-center">
+          <input type="hidden" name="action" value="createOrder" />
+          <button
+            type="submit"
+            className="group transition duration-300 ease-in-out hover:text-slate-600 px-2 py-2"
+          >
+            Złóż zamówienie
+          </button>
+        </div>
       </main>
     </form>
   );

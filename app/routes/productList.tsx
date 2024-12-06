@@ -7,14 +7,16 @@ export const loader: LoaderFunction = async ({ request }) => {
   
   const products = await db.product.findMany();
 
-  return { products };
+  return json({ products });
 };
 
 export default function ProductList(){
-    let products = [];
+    const { products = [] } = useLoaderData();
   
-    const data = { products } = useLoaderData() || { products: [] };
-  
+    const validProducts = products.filter(
+      (Product) => Product.name && Product.image
+    );
+
     return (
       <main className="font-serif">
         <form method="post">
@@ -23,9 +25,9 @@ export default function ProductList(){
               Nasze produkty
             </h1>
             <div className="py-8">
-              {products ? (
+              {validProducts.length > 0  ? (
                 <div className="flex flex-row flex-wrap justify-center gap-5">
-                  {products.map((Product: Product) => {
+                  {validProducts.map((Product) => {
                     return (
                       <div key={Product.id}>
                         <div className="flex flex-col w-60 md:w-80 ">
