@@ -57,6 +57,7 @@ export const action: ActionFunction = async ({ request }) => {
     const session = await sessionStorage.getSession();
     session.set("userId", user.id);
     session.set("email", user.email);
+    session.set("isAdmin", user.isAdmin)
 
     return redirect("/", {
       headers: {

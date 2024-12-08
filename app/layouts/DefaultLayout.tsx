@@ -35,6 +35,12 @@ const DefaultLayout: React.FC<{ children: React.ReactNode, userId: string | null
             <HandleLogin userId={userId} />
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-[#f2e4ca]"></span>
           </div>
+          {isAdmin && (
+          <Link to="/adminPanel" className="group text-[#f2e4ca] transition duration-300 text-sm sm:text-base lg:text-base">
+            ZARZĄDZAJ
+            <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-[#f2e4ca] rounded-lg"></span>
+          </Link>
+          )}
         </div>
 
         <nav className="bg-white flex justify-center space-x-2 md:space-x-6 py-2 p-1 sm:p-2 text-xs md:text-base font-light tracking-widest">

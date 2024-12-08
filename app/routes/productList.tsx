@@ -5,7 +5,9 @@ import { Link } from 'react-router-dom';
 
 export const loader: LoaderFunction = async ({ request }) => {
   
-  const products = await db.product.findMany();
+  const products = await db.product.findMany({
+    include: { sizes: true },
+  });
 
   return json({ products });
 };
@@ -14,7 +16,7 @@ export default function ProductList(){
     const { products = [] } = useLoaderData();
   
     const validProducts = products.filter(
-      (Product) => Product.name && Product.image
+      (Product) => Product.name && Product.image && Product
     );
 
     return (

@@ -49,20 +49,20 @@ export async function destroyUserSession(request: Request) {
   });
 }
 
-export async function addToCart(session: any, productId: string, quantity: number, sizeId: string, price: number) {
+export async function addToCart(session: any, productId: string, stock: number, sizeId: string, price: number) {
   const product = await db.product.findUnique({
     where: { id: productId },
     select: { name: true, image: true },
   });
 
-  const cart: Record<string, { quantity: number; name: string; image: string; sizeId: string; price: number }> = session.get("cart") || {};
+  const cart: Record<string, { stock: number; name: string; image: string; sizeId: string; price: number }> = session.get("cart") || {};
 
   const productKey = `${productId}-${sizeId}`;  // np. "123-1" (gdzie 123 to productId, a 1 to sizeId)
 
   if (cart[productKey]) {
-    cart[productKey].quantity += quantity;
+    cart[productKey].stock += stock;
   } else {
-    cart[productKey] = { quantity, name: product.name, image: product.image, sizeId, price };
+    cart[productKey] = { stock, name: product.name, image: product.image, sizeId, price };
   }
 
   session.set("cart", cart);

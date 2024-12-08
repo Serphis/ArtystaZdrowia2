@@ -1,8 +1,9 @@
 import { Authenticator } from "remix-auth";
-import { sessionStorage } from "./session.server";
+import { getUserFromSession, sessionStorage } from "./session.server";
 import { FormStrategy } from "remix-auth-form";
 import { prisma } from "./prisma.server";
 import bcrypt from "bcryptjs";
+import { redirect } from "@remix-run/node";
 
 // Inicjalizacja sessionStorage i authenticator
 const authenticator = new Authenticator<any>(sessionStorage);
@@ -65,5 +66,17 @@ const formStrategy = new FormStrategy(async ({ form }) => {
 });
 
 authenticator.use(formStrategy, "form");
+
+export async function requireAdmin(request: Request) {
+  const userSession = await getUserSession(request);
+
+  if (!userSession || !userSession.userId || userSession.isAdmin !== true) {
+    console.error("Unauthorized access attempt or invalid session");
+    throw redirect('/login');
+  }
+
+  return userSession;
+}
+
 
 export { authenticator };
