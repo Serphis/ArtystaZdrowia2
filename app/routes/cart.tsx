@@ -10,6 +10,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const sizes = await db.size.findMany();
   
   const matchedItems = {};  // Obiekt, który przechowa dopasowane produkty z rozmiarami i cenami
+  let totalPrice = 0;
 
   for (const key in cart) {
     for (const productKey in products) {
@@ -26,7 +27,7 @@ export const loader: LoaderFunction = async ({ request }) => {
             sizeId: null,
             sizeName: null,
             sizePrice: null,
-            quantity: cart[key].quantity || 1
+            stock: cart[key].stock || 1
           };
         }
 
@@ -36,6 +37,7 @@ export const loader: LoaderFunction = async ({ request }) => {
           matchedItems[uniqueKey].sizeId = matchedSize.id;
           matchedItems[uniqueKey].sizeName = matchedSize.name;
           matchedItems[uniqueKey].sizePrice = matchedSize.price;
+          totalPrice += matchedSize.price * (cart[key].stock || 1);
         }
       }
     }
@@ -46,16 +48,16 @@ export const loader: LoaderFunction = async ({ request }) => {
     return json({ cart: {}, message: "Koszyk jest pusty." });
   }
 
-  return json({ matchedItems, session, products, sizes });
+  return json({ matchedItems, session, products, sizes, totalPrice });
 };
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
-  const actionType = formData.get("action")?.toString(); // Typ akcji: "clear" lub inny
+  const actionType = formData.get("action")?.toString();
   const session = await getSession(request);
 
   if (actionType === "clear") {
-    session.set("cart", {}); // Usuwamy wszystkie dane z koszyka
+    session.set("cart", {});
     const commit = await commitSession(session);
 
     return redirect("/cart", {
@@ -67,19 +69,18 @@ export const action: ActionFunction = async ({ request }) => {
 
   if (actionType === "createOrder") {
     const cart = session.get("cart") || {};
-    // Logika tworzenia zamówienia, np. zapis do bazy danych
     await db.order.create({
       data: {
         items: Object.values(cart).map(item => ({
           productId: item.productId,
-          quantity: item.quantity,
+          stock: item.stock,
           sizeId: item.sizeId,
           price: item.price,
         })),
       },
     });
   
-    session.set("cart", {});  // Wyczyść koszyk po złożeniu zamówienia
+    session.set("cart", {});
     const commit = await commitSession(session);
   
     return redirect("/order-success", {
@@ -106,44 +107,54 @@ export const action: ActionFunction = async ({ request }) => {
   }
   */
 
-  // Obsługa dodawania
   const productId = formData.get("productId")?.toString();
   const sizeId = formData.get("size")?.toString();
-  const quantity = parseInt(formData.get("quantity")?.toString() || "1", 10);
-  const price = parseFloat(formData.get("price")?.toString() || "0");
+  const stock = formData.get("stock")?.toString();
+  const price = formData.get("price")?.toString();
 
-  if (!productId || !sizeId || isNaN(quantity) || isNaN(price)) {
+  if (!productId || !sizeId || isNaN(stock) || isNaN(price)) {
     console.warn("Brakuje danych w formularzu lub dane są nieprawidłowe.");
   }
 
-  await addToCart(session, productId, quantity, sizeId, price);
-  const commit = await commitSession(session);
+  if (actionType !== "clear" && actionType !== "createOrder") {
+    const size = await db.size.findUnique({ where: { id: sizeId } });
+  
+    if (!size || stock > size.stock) {
+      return json(
+        { error: "Nie można dodać więcej produktów niż jest dostępnych na stanie." },
+        { status: 400 }
+      );
+    }
+  
+    await addToCart(session, productId, stock, sizeId, price);
+    const commit = await commitSession(session);
 
-  return redirect("/cart", {
-    headers: {
-      "Set-Cookie": commit,
-    },
-  });
+    return redirect("/cart", {
+      headers: {
+        "Set-Cookie": commit,
+      },
+    });
+  }
 };
 
 export default function Cart() {
-  const { matchedItems = {}, message } = useLoaderData();  // Odbieramy matchedItems z loadera
+  const { matchedItems = {}, message, totalPrice } = useLoaderData();
 
   const isCartEmpty = !matchedItems || Object.keys(matchedItems).length === 0;
 
   return (
     <form method="post">
       <main className="min-h-screen p-4 font-light">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-widest text-center px-2 pt-4 pb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-widest text-center px-2 pt-4 pb-4">
           Koszyk
         </h1>
-        {!isCartEmpty ? ( // Jeśli koszyk nie jest pusty
+        {!isCartEmpty ? (
             <div className="space-y-4 sm:mx-10 md:mx-16 lg:mx-52 xl:mx-72">
               <div className="flex justify-center">
                 <input type="hidden" name="action" value="clear" />
                 <button
                   type="submit"
-                  className="group transition duration-300 ease-in-out hover:text-slate-600 px-2 py-2"
+                  className="group transition duration-300 ease-in-out px-2 py-2 mb-2 text-l ring-1 ring-black hover:bg-black hover:text-white text-black bg-white rounded-sm shadow-lg"
                 >
                   Wyczyść koszyk
                 </button>
@@ -166,7 +177,7 @@ export default function Cart() {
                 <div className="text-right">
                   <p className="text-lg md:text-xl font-bold">{item.sizePrice} zł</p>
                   <p className="text-sm md:text-base">
-                    Ilość: {item.quantity}
+                    Ilość: {item.stock}
                   </p>
                   <p className="text-sm md:text-base">
                     Rozmiar: {item.sizeName}
@@ -174,21 +185,25 @@ export default function Cart() {
                 </div>
               </div>
             ))}
+            <div className="text-center pt-2">
+              <p className="text-xl font-semibold">Całkowita cena: {totalPrice.toFixed(2)} zł</p>
+            </div>
+            <div className="flex justify-center">
+              <input type="hidden" name="action" value="createOrder" />
+              <button
+                type="submit"
+                className="group transition duration-300 ease-in-out px-2 py-2 text-xl ring-1 ring-black hover:bg-black hover:text-white text-black bg-white rounded-sm shadow-lg"
+              >
+                Złóż zamówienie
+              </button>
+            </div>
           </div>
         ) : (
           <p className="text-center tracking-widest mt-6">
             {message || "Twój koszyk jest pusty."}
           </p>
         )}
-        <div className="flex justify-center">
-          <input type="hidden" name="action" value="createOrder" />
-          <button
-            type="submit"
-            className="group transition duration-300 ease-in-out hover:text-slate-600 px-2 py-2"
-          >
-            Złóż zamówienie
-          </button>
-        </div>
+        
       </main>
     </form>
   );

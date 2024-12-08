@@ -57,10 +57,10 @@ export async function addToCart(session: any, productId: string, stock: number, 
 
   const cart: Record<string, { stock: number; name: string; image: string; sizeId: string; price: number }> = session.get("cart") || {};
 
-  const productKey = `${productId}-${sizeId}`;  // np. "123-1" (gdzie 123 to productId, a 1 to sizeId)
+  const productKey = `${productId}-${sizeId}`;
 
   if (cart[productKey]) {
-    cart[productKey].stock += stock;
+    cart[productKey].stock = stock;
   } else {
     cart[productKey] = { stock, name: product.name, image: product.image, sizeId, price };
   }
