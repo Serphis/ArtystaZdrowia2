@@ -6,14 +6,38 @@ export default function Index() {
         <div className="text-center flex flex-col">
             <h2 className="text-4xl md:text-5xl text-center my-10 mb-12">Felinoterapia</h2>
 
-            <div className="text-justify">
-                <h3 className="text-xl px-4 py-1">- Spotkania z psem indywidualne <strong>150 zł</strong></h3>
-                <h3 className="text-xl px-4 py-1">- Spotkania z psem grupowe <strong>ustalane indywidualnie</strong></h3>
-                <h3 className="text-xl px-4 py-1">- Spotkania z kotem indywidualne <strong>150 zł</strong></h3>
-                <h3 className="text-xl px-4 py-1">- Spotkania z kotem grupowe <strong>ustalane indywidualnie</strong></h3>
-                <h3 className="text-xl px-4 py-1">- Spotkania wspólne (pies i kot) indywidualne <strong>250 zł</strong></h3>
-                <h3 className="text-xl px-4 py-1">- Spotkania grupowe wspólne (pies i kot) <strong>ustalane indywidualnie</strong></h3>
+            <div className="sm:px-8 text-justify space-y-1">
+                <h3 className="text-sm md:text-lg lg:text-2xl md:px-4 flex justify-between">
+                    <div className="flex flex-row">
+                        <img src="https://res.cloudinary.com/djio9fbja/image/upload/f_auto,q_auto/v1/public/hpbd7htuzngkd0qutl8h" alt="Opis zdjęcia" className='h-6 lg:h-7 mr-2 object-cover' />
+                        Spotkania z kotem indywidualne
+                    </div>
+                    <div className="ml-2 font-normal">150 zł</div>
 
+                </h3>
+                <h3 className="text-sm md:text-lg lg:text-2xl md:px-4 flex justify-between">
+                    <div className="flex flex-row">
+                    <img src="https://res.cloudinary.com/djio9fbja/image/upload/f_auto,q_auto/v1/public/hpbd7htuzngkd0qutl8h" alt="Opis zdjęcia" className='h-6 lg:h-7 mr-2 object-cover' />
+                        Spotkania z kotem grupowe
+                    </div>
+                    <div className="ml-2 font-normal">ustalane indywidualnie</div>
+
+                </h3>
+                <h3 className="text-sm md:text-lg lg:text-2xl md:px-4 flex justify-between">
+                    <div className="flex flex-row">
+                    <img src="https://res.cloudinary.com/djio9fbja/image/upload/f_auto,q_auto/v1/public/hpbd7htuzngkd0qutl8h" alt="Opis zdjęcia" className='h-6 lg:h-7 mr-2 object-cover' />
+                        Spotkania wspólne (pies i kot) indywidualne
+                    </div>
+                    <div className="ml-2 font-normal">250 zł</div>
+
+                </h3>
+                <h3 className="text-sm md:text-lg lg:text-2xl md:px-4 flex justify-between">
+                    <div className="flex flex-row">
+                    <img src="https://res.cloudinary.com/djio9fbja/image/upload/f_auto,q_auto/v1/public/hpbd7htuzngkd0qutl8h" alt="Opis zdjęcia" className='h-6 lg:h-7 mr-2 object-cover' />
+                        Spotkania grupowe wspólne (pies i kot)
+                    </div>
+                    <div className="ml-2 font-normal">ustalane indywidualnie</div>
+                </h3>
                 <h3 className="text-xl pt-8 text-justify">
                     <strong>Felinoterapia</strong> to terapia, w której towarzyszy pacjentowi kot. Koty to zwierzęta
                     bardzo tajemnicze, które jednak szybko potrafią zbudować specyficzną więź z człowiekiem. Zwierzę
