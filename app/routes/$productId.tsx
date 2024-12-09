@@ -31,11 +31,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     await addToCart(session, productId, stock, sizeId, price);
     const commit = await commitSession(session);
 
-    return redirect("/cart", {
-        headers: {
-            "Set-Cookie": commit,
-        },
-    });
+    return redirect("/cart");
 };
 
 export default function ProductInfo() {

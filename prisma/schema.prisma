@@ -20,8 +20,6 @@ model User {
   name      String?
   isAdmin   Boolean  @default(false)
   createdAt DateTime @default(now())
-  
-  orders    Order[]
 }
 
 model Product {
@@ -43,12 +41,12 @@ model Size {
   productId String   @db.ObjectId
   stock     Int     @default(0)
   product   Product @relation("ProductSizes", fields: [productId], references: [id])
+  orderItems OrderItem[]
 }
 
 model Order {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId
-  user        User     @relation(fields: [userId], references: [id])
+  email       String
   products    OrderItem[]
   totalPrice  Float
   status      String   @default("Oczekujące")
@@ -64,7 +62,9 @@ model OrderItem {
   productId String   @db.ObjectId
   product   Product  @relation(fields: [productId], references: [id])
 
-  sizeName  String
+  sizeId    String   @db.ObjectId
+  size      Size     @relation(fields: [sizeId], references: [id])
+
   sizePrice Float
   sizeStock Int
   quantity  Int      @default(1)

@@ -3,19 +3,17 @@ import { db } from "../services/index";
 import { ActionFunction, LoaderFunction, MaxPartSizeExceededError, json, redirect } from "@remix-run/node";
 import { getSession, commitSession, addToCart } from "../utils/session.server";
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const session = await getSession(request);
+export async function getCartData(session) {
   const cart = session.get("cart") || {};
   const products = await db.product.findMany();
   const sizes = await db.size.findMany();
-  
-  const matchedItems = {};  // Obiekt, który przechowa dopasowane produkty z rozmiarami i cenami
+
+  const matchedItems = {};
   let totalPrice = 0;
 
   for (const key in cart) {
     for (const productKey in products) {
       const uniqueKey = `${products[productKey].id}-${cart[key].sizeId}`;
-      
       if (key === uniqueKey) {
         const productId = products[productKey].id;
 
@@ -27,7 +25,7 @@ export const loader: LoaderFunction = async ({ request }) => {
             sizeId: null,
             sizeName: null,
             sizePrice: null,
-            stock: cart[key].stock || 1
+            stock: cart[key].stock || 1,
           };
         }
 
@@ -43,12 +41,18 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
   }
 
+  return { matchedItems, totalPrice };
+}
 
-  if (Object.keys(cart).length === 0) {
+export const loader: LoaderFunction = async ({ request }) => {
+  const session = await getSession(request);
+  const { matchedItems, totalPrice } = await getCartData(session);
+
+  if (Object.keys(matchedItems).length === 0) {
     return json({ cart: {}, message: "Koszyk jest pusty." });
   }
 
-  return json({ matchedItems, session, products, sizes, totalPrice });
+  return json({ matchedItems, totalPrice });
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -68,77 +72,51 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   if (actionType === "createOrder") {
-    const cart = session.get("cart") || {};
-    await db.order.create({
-      data: {
-        items: Object.values(cart).map(item => ({
-          productId: item.productId,
-          stock: item.stock,
-          sizeId: item.sizeId,
-          price: item.price,
-        })),
-      },
+    const { matchedItems, totalPrice } = await getCartData(session);
+
+    if (!matchedItems || Object.keys(matchedItems).length === 0) {
+      return json({ error: "Koszyk jest pusty." }, { status: 400 });
+    }
+
+    const deliveryCost = 12.99;
+    const totalWithDelivery = totalPrice + deliveryCost;  
+
+    session.set("order", {
+      products: Object.values(matchedItems),
+      totalPrice,
+      deliveryCost,
+      totalWithDelivery,
     });
   
-    session.set("cart", {});
     const commit = await commitSession(session);
-  
-    return redirect("/order-success", {
+
+    return redirect("/checkout", {
       headers: {
         "Set-Cookie": commit,
       },
     });
   }
-
-  // Obsługa usuwania pojedynczego produktu - Zostawiona jako komentarz
-  /*
-  const productId = formData.get("productId")?.toString();
-  if (actionType === "delete" && productId) {
-    const cart = session.get("cart") || {};
-    delete cart[productId];
-    session.set("cart", cart);
-    const commit = await commitSession(session);
-
-    return redirect("/cart", {
-      headers: {
-        "Set-Cookie": commit,
-      },
-    });
-  }
-  */
 
   const productId = formData.get("productId")?.toString();
   const sizeId = formData.get("size")?.toString();
   const stock = formData.get("stock")?.toString();
   const price = formData.get("price")?.toString();
 
-  if (!productId || !sizeId || isNaN(stock) || isNaN(price)) {
-    console.warn("Brakuje danych w formularzu lub dane są nieprawidłowe.");
-  }
+  await addToCart(session, productId, stock, sizeId, price);
+  const commit = await commitSession(session);
 
-  if (actionType !== "clear" && actionType !== "createOrder") {
-    const size = await db.size.findUnique({ where: { id: sizeId } });
-  
-    if (!size || stock > size.stock) {
-      return json(
-        { error: "Nie można dodać więcej produktów niż jest dostępnych na stanie." },
-        { status: 400 }
-      );
-    }
-  
-    await addToCart(session, productId, stock, sizeId, price);
-    const commit = await commitSession(session);
-
-    return redirect("/cart", {
-      headers: {
-        "Set-Cookie": commit,
-      },
-    });
-  }
+  return redirect("/cart", {
+    headers: {
+      "Set-Cookie": commit,
+    },
+  });
 };
 
 export default function Cart() {
   const { matchedItems = {}, message, totalPrice } = useLoaderData();
+
+  const deliveryCost = 12.99; 
+  const totalWithDelivery = totalPrice + deliveryCost;
 
   const isCartEmpty = !matchedItems || Object.keys(matchedItems).length === 0;
 
@@ -151,9 +129,10 @@ export default function Cart() {
         {!isCartEmpty ? (
             <div className="space-y-4 sm:mx-10 md:mx-16 lg:mx-52 xl:mx-72">
               <div className="flex justify-center">
-                <input type="hidden" name="action" value="clear" />
                 <button
                   type="submit"
+                  name="action"
+                  value="clear"
                   className="group transition duration-300 ease-in-out px-2 py-2 mb-2 text-l ring-1 ring-black hover:bg-black hover:text-white text-black bg-white rounded-sm shadow-lg"
                 >
                   Wyczyść koszyk
@@ -185,13 +164,44 @@ export default function Cart() {
                 </div>
               </div>
             ))}
-            <div className="text-center pt-2">
-              <p className="text-xl font-semibold">Całkowita cena: {totalPrice.toFixed(2)} zł</p>
+            {/* Sekcja dostawy */}
+            <div className="pt-6">
+              <h2 className="text-lg sm:text-xl lg:text-2xl tracking-wider font-medium">
+                Opcje dostawy
+              </h2>
+              <div className="flex items-center space-x-2 mt-2">
+                <input
+                  type="radio"
+                  id="inpost-paczkomat"
+                  name="delivery"
+                  value="inpost-paczkomat"
+                  defaultChecked
+                  className="h-4 w-4"
+                />
+                <label htmlFor="inpost-paczkomat" className="text-base sm:text-lg">
+                  InPost Paczkomat - {deliveryCost.toFixed(2)} zł
+                </label>
+              </div>
             </div>
+
+            {/* Podsumowanie cen */}
+            <div className="text-center pt-6">
+              <p className="text-lg sm:text-xl lg:text-2xl font-semibold">
+                Cena produktów: {totalPrice.toFixed(2)} zł
+              </p>
+              <p className="text-lg sm:text-xl lg:text-2xl font-semibold">
+                Koszt dostawy: {deliveryCost.toFixed(2)} zł
+              </p>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-bold mt-2">
+                Suma: {totalWithDelivery.toFixed(2)} zł
+              </p>
+            </div>
+            
             <div className="flex justify-center">
-              <input type="hidden" name="action" value="createOrder" />
               <button
                 type="submit"
+                name="action"
+                value="createOrder"
                 className="group transition duration-300 ease-in-out px-2 py-2 text-xl ring-1 ring-black hover:bg-black hover:text-white text-black bg-white rounded-sm shadow-lg"
               >
                 Złóż zamówienie
