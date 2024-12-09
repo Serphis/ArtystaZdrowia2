@@ -1,8 +1,10 @@
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useFetcher } from "@remix-run/react";
 import { useState } from "react";
 import { json, LoaderFunction, ActionFunction } from "@remix-run/node";
 import { getSession, commitSession } from "../utils/session.server"; // Funkcja do pobierania sesji (zależnie od implementacji)
 import { getCartData } from "./cart"; // Import getCartData z routes/cart
+
+import fetch from "node-fetch";
 
 export const loader: LoaderFunction = async ({ request }) => {
     const session = await getSession(request);
@@ -34,18 +36,73 @@ export let action: ActionFunction = async ({ request }) => {
         shippingMethod: formData.get("shippingMethod"),
     };
 
-    return json(
-        { success: true, order },
-        {
+    const clientId = "YOUR_CLIENT_ID";
+    const clientSecret = "YOUR_CLIENT_SECRET";
+    const sandboxUrl = "https://secure.snd.payu.com/";
+
+    const authResponse = await fetch(`${sandboxUrl}pl/standard/user/oauth/authorize`, {
+        method: "POST",
         headers: {
-            "Set-Cookie": await commitSession(session),
+            "Content-Type": "application/x-www-form-urlencoded",
         },
-        }
-    );
+        body: new URLSearchParams({
+            grant_type: "client_credentials",
+            client_id: clientId,
+            client_secret: clientSecret,
+        }),
+    });
+
+    const { access_token } = await authResponse.json();
+
+    if (!access_token) {
+        throw new Error("Failed to obtain PayU access token");
+    }
+
+    const payuOrder = {
+        notifyUrl: "https://your-public-url/notify",
+        continueUrl: "https://your-public-url/return",
+        customerIp: "127.0.0.1",
+        merchantPosId: clientId,
+        description: "Zamówienie w sklepie",
+        currencyCode: "PLN",
+        totalAmount: Math.round(totalPrice * 100), // PayU wymaga groszy
+        buyer: {
+            email: order.customer.email,
+            phone: order.customer.phone,
+            firstName: order.customer.firstName,
+            lastName: order.customer.lastName,
+            language: "pl",
+        },
+        products: Object.values(cart).map((item) => ({
+            name: item.name,
+            unitPrice: Math.round(item.sizePrice * 100),
+            quantity: item.stock,
+        })),
+    };
+
+    const payuResponse = await fetch(`${sandboxUrl}api/v2_1/orders`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${access_token}`,
+        },
+        body: JSON.stringify(payuOrder),
+    });
+
+    const payuData = await payuResponse.json();
+
+    if (payuData.status.statusCode !== "SUCCESS") {
+        throw new Error("Failed to create PayU order");
+    }
+
+    return json({ redirectUrl: payuData.redirectUri });
+
 };
 
 export default function CheckoutPage() {
   const { cart, totalPrice } = useLoaderData();
+  const fetcher = useFetcher();
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -62,6 +119,17 @@ export default function CheckoutPage() {
 
   const shippingCost = 12.99;
   const grandTotal = totalPrice + shippingCost;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const form = e.target;
+
+    fetcher.submit(new FormData(form), { method: "post" });
+  };
+
+  if (fetcher.data?.redirectUrl) {
+    window.location.href = fetcher.data.redirectUrl;
+  }
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
