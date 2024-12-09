@@ -40,15 +40,15 @@ export let action: ActionFunction = async ({ request }) => {
     const clientSecret = "YOUR_CLIENT_SECRET";
     const sandboxUrl = "https://secure.snd.payu.com/";
 
-    const authResponse = await fetch(`${sandboxUrl}pl/standard/user/oauth/authorize`, {
+    const authResponse = await fetch(`${process.env.PAYU_SANDBOX_URL}pl/standard/user/oauth/authorize`, {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
         },
         body: new URLSearchParams({
             grant_type: "client_credentials",
-            client_id: clientId,
-            client_secret: clientSecret,
+            client_id: process.env.PAYU_CLIENT_ID,
+            client_secret: process.env.PAYU_CLIENT_SECRET,
         }),
     });
 
@@ -59,13 +59,13 @@ export let action: ActionFunction = async ({ request }) => {
     }
 
     const payuOrder = {
-        notifyUrl: "https://your-public-url/notify",
-        continueUrl: "https://your-public-url/return",
+        notifyUrl: "process.env.PAYU_NOTIFY_URL",
+        continueUrl: "process.env.PAYU_RETURN_URL",
         customerIp: "127.0.0.1",
-        merchantPosId: clientId,
-        description: "Zamówienie w sklepie",
+        merchantPosId: process.env.PAYU_CLIENT_ID,
+        description: "Zamówienie w Artysta Zdrowia",
         currencyCode: "PLN",
-        totalAmount: Math.round(totalPrice * 100), // PayU wymaga groszy
+        totalAmount: Math.round(totalPrice * 100),
         buyer: {
             email: order.customer.email,
             phone: order.customer.phone,
@@ -80,7 +80,7 @@ export let action: ActionFunction = async ({ request }) => {
         })),
     };
 
-    const payuResponse = await fetch(`${sandboxUrl}api/v2_1/orders`, {
+    const payuResponse = await fetch(`${process.env.PAYU_SANDBOX_URL}api/v2_1/orders`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

@@ -3,12 +3,13 @@ import { useLoaderData } from "@remix-run/react";
 
 export const loader: LoaderFunction = async ({ request }) => {
     const url = new URL(request.url);
+    const orderId = url.searchParams.get("orderId");
     const status = url.searchParams.get("status");
-    return json({ status });
+      return json({ orderId, status });
 };
 
 export default function ReturnPage() {
-    const { status } = useLoaderData();
+    const { orderId, status } = useLoaderData();
 
     return (
         <main className="min-h-screen flex flex-col items-center justify-center p-4">
