@@ -1,5 +1,5 @@
 import { useLoaderData, useFetcher } from "@remix-run/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { json, LoaderFunction, ActionFunction } from "@remix-run/node";
 import { getSession, commitSession } from "../utils/session.server"; // Funkcja do pobierania sesji (zależnie od implementacji)
 import { getCartData } from "./cart"; // Import getCartData z routes/cart
@@ -15,6 +15,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   };
 
 export let action: ActionFunction = async ({ request }) => {
+try {
     const formData = new URLSearchParams(await request.text());
     const session = await getSession(request);
 
@@ -36,10 +37,7 @@ export let action: ActionFunction = async ({ request }) => {
         shippingMethod: formData.get("shippingMethod"),
     };
 
-    const clientId = "YOUR_CLIENT_ID";
-    const clientSecret = "YOUR_CLIENT_SECRET";
-    const sandboxUrl = "https://secure.snd.payu.com/";
-
+    // Uzyskanie tokena dostępu
     const authResponse = await fetch(`${process.env.PAYU_SANDBOX_URL}pl/standard/user/oauth/authorize`, {
         method: "POST",
         headers: {
@@ -58,10 +56,11 @@ export let action: ActionFunction = async ({ request }) => {
         throw new Error("Failed to obtain PayU access token");
     }
 
+    // Tworzenie zamówienia
     const payuOrder = {
-        notifyUrl: "process.env.PAYU_NOTIFY_URL",
-        continueUrl: "process.env.PAYU_RETURN_URL",
-        customerIp: "127.0.0.1",
+        notifyUrl: process.env.PAYU_NOTIFY_URL,
+        continueUrl: process.env.PAYU_RETURN_URL,
+        customerIp: "0.0.0.0",
         merchantPosId: process.env.PAYU_CLIENT_ID,
         description: "Zamówienie w Artysta Zdrowia",
         currencyCode: "PLN",
@@ -96,7 +95,11 @@ export let action: ActionFunction = async ({ request }) => {
     }
 
     return json({ redirectUrl: payuData.redirectUri });
+    } catch (error) {
+    console.error(error);
+    return json({ error: "Wystąpił problem z płatnością. Spróbuj ponownie później." }, { status: 500 });
 
+    }
 };
 
 export default function CheckoutPage() {
@@ -138,6 +141,17 @@ export default function CheckoutPage() {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://geowidget.easypack24.net/js/sdk-for-javascript.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return (
     <main className="min-h-screen flex flex-col items-center p-4">
@@ -250,20 +264,59 @@ export default function CheckoutPage() {
         </section>
 
         <fieldset className="space-y-2">
-          <legend className="text-lg font-medium">Wybór przesyłki</legend>
-          <label>
-            <input
-              type="radio"
-              name="shippingMethod"
-              value="Paczkomat - 12.99 zł"
-              checked={formData.shippingMethod === "Paczkomat - 12.99 zł"}
-              onChange={handleChange}
-              className="mr-2"
-            />
-            Paczkomat - 12.99 zł
-          </label>
-        </fieldset>
+            <legend className="text-lg font-medium">Wybór przesyłki</legend>
+            <label className="block">
+                <input
+                type="radio"
+                name="shippingMethod"
+                value="Paczkomat"
+                checked={formData.shippingMethod === "Paczkomat"}
+                onChange={handleChange}
+                className="mr-2"
+                />
+                Paczkomat
+            </label>
+            <label className="block">
+                <input
+                type="radio"
+                name="shippingMethod"
+                value="Kurier"
+                checked={formData.shippingMethod === "Kurier"}
+                onChange={handleChange}
+                className="mr-2"
+                />
+                Kurier
+            </label>
 
+            {formData.shippingMethod === "Paczkomat" && (
+                <div id="inpost-widget" className="mt-4">
+                <button
+                    type="button"
+                    className="w-full p-2 bg-blue-500 text-white rounded"
+                    onClick={() => {
+                    window.easyPack.open({
+                        mapType: "osm",
+                        onclose: () => console.log("Widget zamknięty"),
+                        onpoint: (point) => {
+                        handleChange({
+                            target: {
+                            name: "selectedParcelLocker",
+                            value: point.name,
+                            },
+                        });
+                        },
+                    });
+                    }}
+                >
+                    Wybierz paczkomat
+                </button>
+                {formData.selectedParcelLocker && (
+                    <p className="mt-2">Wybrany paczkomat: {formData.selectedParcelLocker}</p>
+                )}
+                </div>
+            )}
+            </fieldset>
+            
         <fieldset className="space-y-2">
           <legend className="text-lg font-medium">Regulamin</legend>
           <p className="text-sm">

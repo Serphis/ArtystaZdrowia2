@@ -62,6 +62,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         />
         <Meta />
         <Links />
+        <script src="https://geowidget.easypack24.net/js/sdk-for-javascript.js"></script>
       </head>
       <body>
         <DefaultLayout userId={user.userId} isAdmin={user.isAdmin}>
