@@ -84,26 +84,8 @@ export default function Checkout() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    alert("Rozpoczęto funkcję handleSubmit");
-
-    alert("Rozpoczęcie składania zamówienia");
-
-    alert("Pobieranie IP użytkownika...");
-
     const ipResponse = await axios.get("https://api.ipify.org");
     const customerIp = ipResponse.data;
-    alert("IP użytkownika:" + JSON.stringify(ipResponse.data));
-
-    alert("Całkowita kwota (zł):" + JSON.stringify(totalAmount));
-
-    alert("Tworzenie obiektu orderData...");
-
-    alert("formData.email: " + JSON.stringify(formData.email));
-    alert("formData.phone: " + JSON.stringify(formData.phone));
-    alert("formData.firstName: " + JSON.stringify(formData.firstName));
-    alert("formData.lastName: " + JSON.stringify(formData.lastName));
-
-    alert("Wybrana metoda płatności: " + JSON.stringify(selectedPaymentMethod));
 
     const orderData = {
       notifyUrl: 'https://artystazdrowia.com/notify', // Adres do odbierania powiadomień o płatności
@@ -124,12 +106,9 @@ export default function Checkout() {
       products: Object.keys(cart).map((key) => ({
         name: cart[key].name, // Nazwa produktu
         unitPrice: String(cart[key].sizePrice * 100), // Cena jednostkowa w groszach
+        quantity: cart[key].quantity // Ilość produktów
       }))
     };
-
-    alert("Utworzony obiekt orderData:" + JSON.stringify(orderData));
-
-    alert("Wysyłanie danych zamówienia do API PayU...");
 
     try {
       const response = await axios.post("https://secure.snd.payu.com/api/v2_1/orders", orderData, {
@@ -138,22 +117,21 @@ export default function Checkout() {
           "Authorization": `Bearer ${accessToken}`,
         },
       });
-    
-      alert("Otrzymano odpowiedź od API PayU:" + JSON.stringify(response));
-    
-      if (response.status === 401) {
-        alert("Błąd autoryzacji: Sprawdź token dostępu");
-      } else if (response.status >= 200 && response.status < 300) {
-        alert("Zamówienie zostało pomyślnie złożone!");
+        
+      if (response.status === 200 && response.data.status.statusCode === 'SUCCESS') {
+        // Jeśli odpowiedź jest poprawna, wykonaj przekierowanie
+        const redirectUri = response.data.redirectUri;
+        window.location.href = redirectUri; // Przekierowanie do strony płatności
       } else {
-        alert("Nieoczekiwany status odpowiedzi:" + JSON.stringify(response.status));
-        alert(`Wystąpił problem: ${response.status}`);
+        // Obsługa błędów
+        console.error("Błąd podczas składania zamówienia:", response.data);
+        alert("Wystąpił problem z przetworzeniem zamówienia. Spróbuj ponownie.");
       }
     } catch (error) {
-      console.error("Błąd podczas komunikacji z PayU: ", error);
+      console.error("Błąd podczas komunikacji z PayU:", error);
       alert("Błąd podczas wysyłania zapytania do PayU. Zobacz konsolę.");
     }
-  }
+  };
 
   return (
     <main className="min-h-screen flex flex-col items-center p-4">
