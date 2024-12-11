@@ -111,7 +111,7 @@ export default function Checkout() {
     };
 
     try {
-      const response = await fetch('/api/createOrder', {
+      const response = await fetch('createOrder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderData }),
