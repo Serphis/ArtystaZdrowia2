@@ -1,18 +1,27 @@
-export const action = async ({ request }: { request: Request }) => {
-  if (request.method === "POST") {
-    const { orderData } = await request.json();
+import axios from "axios";
+
+export default async function handler(req, res) {
+  if (req.method === 'POST') {
     try {
+      console.log("Otrzymano dane zamówienia:", req.body);  // Logowanie danych wejściowych
+      
+      const { orderData } = req.body;
+
       const response = await axios.post('https://secure.snd.payu.com/api/v2_1/orders', orderData, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.PAYU_ACCESS_TOKEN}`,
         },
       });
-      return new Response(JSON.stringify(response.data), { status: 200 });
+
+      console.log("Odpowiedź z PayU:", response.data);  // Logowanie odpowiedzi
+
+      res.status(200).json(response.data);
     } catch (error) {
-      console.error("Błąd komunikacji z PayU:", error);
-      return new Response("Błąd podczas przetwarzania zamówienia", { status: 500 });
+      console.error('Błąd podczas komunikacji z PayU:', error);
+      res.status(500).json({ error: 'Błąd podczas przetwarzania zamówienia' });
     }
+  } else {
+    res.status(405).json({ error: 'Metoda nieobsługiwana' });
   }
-  return new Response("Metoda nieobsługiwana", { status: 405 });
-};
+}
