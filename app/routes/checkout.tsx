@@ -2,13 +2,15 @@ import { json, LoaderFunction } from "@remix-run/node";
 import { getSession } from "~/utils/session.server";
 import { getCartData } from "./cart";
 import { useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 
 
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
   const { matchedItems, totalPrice } = await getCartData(session);
+  const uniqueOrderId = uuidv4();
 
   const client_id = process.env.PAYU_CLIENT_ID;
   const client_secret = process.env.PAYU_CLIENT_SECRET;
@@ -37,11 +39,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const paymentMethods = paymentMethodsResponse.data;
 
-  return json({ cart: matchedItems, totalPrice, paymentMethods });
+  return json({ cart: matchedItems, totalPrice, paymentMethods, uniqueOrderId });
 };
 
 export default function Checkout() {
-  const { cart, totalPrice, paymentMethods } = useLoaderData();
+  const { cart, totalPrice, paymentMethods, uniqueOrderId } = useLoaderData();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -58,7 +60,8 @@ export default function Checkout() {
   });
 
   const shippingCost = 12.99;
-  const grandTotal = totalPrice + shippingCost;
+  const grandTotal = (totalPrice + shippingCost).toFixed(2);
+  const totalAmount = String(Math.round((totalPrice + shippingCost) * 100));
 
     const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -77,41 +80,40 @@ export default function Checkout() {
   const handlePaymentMethodChange = (methodValue: string) => {
     setSelectedPaymentMethod(methodValue);
   };
-
-
   
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Dane formularza:", formData);
+    alert("Rozpoczęto funkcję handleSubmit");
 
-    console.log("Rozpoczęto funkcję handleSubmit"); // Log na samym początku
+    alert("Rozpoczęcie składania zamówienia");
 
-    console.log("Rozpoczęcie składania zamówienia");
+    alert("Pobieranie IP użytkownika...");
 
-    // Pobranie IP użytkownika za pomocą API ipify
-    console.log("Pobieranie IP użytkownika...");
+    const ipResponse = await axios.get("https://api.ipify.org");
+    const customerIp = ipResponse.data;
+    alert("IP użytkownika:" + JSON.stringify(ipResponse.data));
 
-    const ipResponse = await axios.get("https://api.ipify.org?format=json");
-    const customerIp = ipResponse.data.ip;
-    console.log("IP użytkownika:", customerIp);
+    alert("Całkowita kwota (zł):" + JSON.stringify(totalAmount));
 
-    console.log("Całkowita kwota (zł):", grandTotal);
+    alert("Tworzenie obiektu orderData...");
 
-    console.log("Tworzenie obiektu orderData...");
+    alert("formData.email: " + JSON.stringify(formData.email));
+    alert("formData.phone: " + JSON.stringify(formData.phone));
+    alert("formData.firstName: " + JSON.stringify(formData.firstName));
+    alert("formData.lastName: " + JSON.stringify(formData.lastName));
+
+    alert("Wybrana metoda płatności: " + JSON.stringify(selectedPaymentMethod));
 
     const orderData = {
-      continueUrl: 'https://artystazdrowia.com/return', // Adres, na który użytkownik zostanie przekierowany po zakończeniu płatności
       notifyUrl: 'https://artystazdrowia.com/notify', // Adres do odbierania powiadomień o płatności
-      customerIp: customerIp, // Przykładowy IP klienta, należy dostarczyć poprawne
+      customerIp: customerIp,
       merchantPosId: process.env.PAYU_POS_ID, // Identyfikator punktu sprzedaży
       description: 'Zamówienie z Artysta Zdrowia', // Opis zamówienia
-      visibleDescription: 'Produkty z Artysta Zdrowia', // Opis widoczny dla kupującego na stronie płatności
       currencyCode: 'PLN', // Waluta zgodna z ISO 4217
-      totalAmount: String(grandTotal * 100),
-      validityTime: '86400', // Czas ważności zamówienia w sekundach (domyślnie 24h)
+      totalAmount: totalAmount,
+      extOrderId: uniqueOrderId, // Unikalny identyfikator zamówienia (np. generowany na backendzie)
       buyer: {
-        extCustomerId: formData.customerId || 'unknown', // ID klienta w systemie
         email: formData.email, // Adres email klienta
         phone: formData.phone, // Numer telefonu klienta
         firstName: formData.firstName, // Imię klienta
@@ -119,35 +121,26 @@ export default function Checkout() {
         language: 'pl', // Język
       },
       products: Object.keys(cart).map((key) => ({
-        name: cart[key].name,
+        name: cart[key].name, // Nazwa produktu
         unitPrice: String(cart[key].sizePrice * 100), // Cena jednostkowa w groszach
         quantity: String(cart[key].stock), // Ilość produktu
-        productId: cart[key].productId, // Id produktu
-        sizeId: cart[key].sizeId, // Id rozmiaru
-        sizeName: cart[key].sizeName, // Nazwa rozmiaru
-      })),
-      payMethods: {
-        type: 'PBL', // Typ płatności (np. PBL dla przelewu online)
-        value: selectedPaymentMethod, // Wybrana metoda płatności (np. karta kredytowa, BLIK)
-      },
-      shippingMethods: [{
-        name: formData.shippingMethod, // Metoda dostawy
-      }],
+      }))
     };
-    console.log("Utworzony obiekt orderData:", orderData);
 
-    console.log("Wysyłanie danych zamówienia do API PayU...");
+    alert("Utworzony obiekt orderData:" + JSON.stringify(orderData));
+
+    alert("Wysyłanie danych zamówienia do API PayU...");
 
     const response = await axios.post("https://secure.snd.payu.com/api/v2_1/orders", orderData);
 
-    console.log("Otrzymano odpowiedź od API PayU:", response);
+    alert("Otrzymano odpowiedź od API PayU:" + JSON.stringify(response));
 
     if (response.status >= 200 && response.status < 300) {
-      console.log("Zamówienie zostało pomyślnie złożone!");
+      alert("Zamówienie zostało pomyślnie złożone!");
 
       alert("Zamówienie zostało pomyślnie złożone!");
     } else {
-      console.warn("Nieoczekiwany status odpowiedzi:", response.status);
+      alert("Nieoczekiwany status odpowiedzi:" + JSON.stringify(response.status));
 
       alert(`Wystąpił problem: ${response.status}`);
     }
@@ -259,71 +252,9 @@ export default function Checkout() {
           </div>
           <div className="flex justify-between font-bold">
             <span>Suma</span>
-            <span>{grandTotal.toFixed(2)} zł</span>
+            <span>{grandTotal} zł</span>
           </div>
         </section>
-
-        <fieldset className="space-y-2">
-            <legend className="text-lg font-medium">Wybór przesyłki</legend>
-            <label className="block">
-                <input
-                type="radio"
-                name="shippingMethod"
-                value="Paczkomat"
-                checked={formData.shippingMethod === "Paczkomat"}
-                onChange={handleChange}
-                className="mr-2"
-                />
-                Paczkomat
-            </label>
-            <label className="block">
-                <input
-                type="radio"
-                name="shippingMethod"
-                value="Kurier"
-                checked={formData.shippingMethod === "Kurier"}
-                onChange={handleChange}
-                className="mr-2"
-                />
-                Kurier
-            </label>
-
-            {formData.shippingMethod === "Paczkomat" && (
-              <div id="inpost-widget" className="mt-4">
-                <button
-                  type="button"
-                  className="w-full p-2 bg-blue-500 text-white rounded"
-                  onClick={() => {
-                    if (window.easyPack) {
-                      console.log("Uruchomiono widget InPost");
-                      window.easyPack.open({
-                        mapType: "osm",
-                        onclose: () => console.log("Widget zamknięty"),
-                        onpoint: (point) => {
-                          console.log("Wybrany paczkomat:", point.name);
-                          handleChange({
-                            target: {
-                              name: "selectedParcelLocker",
-                              value: point.name,
-                            },
-                          });
-                        },
-                      });
-                    } else {
-                      console.error("InPost SDK nie jest dostępny.");
-                    }
-                  }}
-                >
-                  Wybierz paczkomat
-                </button>
-                {formData.selectedParcelLocker && (
-                  <p className="mt-2">
-                    Wybrany paczkomat: {formData.selectedParcelLocker}
-                  </p>
-                )}
-              </div>
-            )}
-            </fieldset>
 
             <div>
               <h2 className="text-xl font-semibold">Wybierz metodę płatności</h2>
