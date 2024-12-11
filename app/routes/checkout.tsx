@@ -111,7 +111,11 @@ export default function Checkout() {
     };
 
     try {
-      const response = await axios.post('/api/createOrder', { orderData });
+      const response = await fetch('/api/createOrder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderData }),
+      });
   
       if (response.status === 200) {
         const redirectUri = response.data.redirectUri;
