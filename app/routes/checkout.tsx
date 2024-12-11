@@ -1,4 +1,4 @@
-import { json, LoaderFunction } from "@remix-run/node";
+import { json, LoaderFunction, redirect } from "@remix-run/node";
 import { getSession } from "~/utils/session.server";
 import { getCartData } from "./cart";
 import { useLoaderData } from "@remix-run/react";
@@ -39,11 +39,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const paymentMethods = paymentMethodsResponse.data;
 
-  return json({ cart: matchedItems, totalPrice, paymentMethods, uniqueOrderId });
+  return json({ cart: matchedItems, totalPrice, paymentMethods, uniqueOrderId, accessToken });
 };
 
 export default function Checkout() {
-  const { cart, totalPrice, paymentMethods, uniqueOrderId } = useLoaderData();
+  const { cart, totalPrice, paymentMethods, uniqueOrderId, accessToken } = useLoaderData();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -107,6 +107,7 @@ export default function Checkout() {
 
     const orderData = {
       notifyUrl: 'https://artystazdrowia.com/notify', // Adres do odbierania powiadomień o płatności
+      redirectUri: "https://artystazdrowia.com/return",
       customerIp: customerIp,
       merchantPosId: process.env.PAYU_POS_ID, // Identyfikator punktu sprzedaży
       description: 'Zamówienie z Artysta Zdrowia', // Opis zamówienia
@@ -131,7 +132,12 @@ export default function Checkout() {
 
     alert("Wysyłanie danych zamówienia do API PayU...");
 
-    const response = await axios.post("https://secure.snd.payu.com/api/v2_1/orders", orderData);
+    const response = await axios.post("https://secure.snd.payu.com/api/v2_1/orders", orderData, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`,
+      },
+    });
 
     alert("Otrzymano odpowiedź od API PayU:" + JSON.stringify(response));
 
