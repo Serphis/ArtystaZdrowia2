@@ -139,6 +139,10 @@ export default function Checkout() {
       },
     });
 
+    if (response.status === 401) {
+      alert("Błąd autoryzacji: Sprawdź token dostępu");
+    }
+
     alert("Otrzymano odpowiedź od API PayU:" + JSON.stringify(response));
 
     if (response.status >= 200 && response.status < 300) {
