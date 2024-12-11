@@ -111,25 +111,17 @@ export default function Checkout() {
     };
 
     try {
-      const response = await axios.post("https://secure.snd.payu.com/api/v2_1/orders", orderData, {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${accessToken}`,
-        },
-      });
-        
-      if (response.status === 200 && response.data.status.statusCode === 'SUCCESS') {
-        // Jeśli odpowiedź jest poprawna, wykonaj przekierowanie
+      const response = await axios.post('/api/createOrder', { orderData });
+  
+      if (response.status === 200) {
         const redirectUri = response.data.redirectUri;
-        window.location.href = redirectUri; // Przekierowanie do strony płatności
+        window.location.href = redirectUri;
       } else {
-        // Obsługa błędów
-        console.error("Błąd podczas składania zamówienia:", response.data);
-        alert("Wystąpił problem z przetworzeniem zamówienia. Spróbuj ponownie.");
+        alert("Wystąpił problem z zamówieniem.");
       }
     } catch (error) {
-      console.error("Błąd podczas komunikacji z PayU:", error);
-      alert("Błąd podczas wysyłania zapytania do PayU. Zobacz konsolę.");
+      console.error('Błąd:', error);
+      alert("Wystąpił problem z przesyłaniem zamówienia.");
     }
   };
 
