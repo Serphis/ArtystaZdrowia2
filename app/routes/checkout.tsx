@@ -124,7 +124,6 @@ export default function Checkout() {
       products: Object.keys(cart).map((key) => ({
         name: cart[key].name, // Nazwa produktu
         unitPrice: String(cart[key].sizePrice * 100), // Cena jednostkowa w groszach
-        quantity: String(cart[key].stock), // Ilość produktu
       }))
     };
 
@@ -132,29 +131,29 @@ export default function Checkout() {
 
     alert("Wysyłanie danych zamówienia do API PayU...");
 
-    const response = await axios.post("https://secure.snd.payu.com/api/v2_1/orders", orderData, {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${accessToken}`,
-      },
-    });
-
-    if (response.status === 401) {
-      alert("Błąd autoryzacji: Sprawdź token dostępu");
+    try {
+      const response = await axios.post("https://secure.snd.payu.com/api/v2_1/orders", orderData, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}`,
+        },
+      });
+    
+      alert("Otrzymano odpowiedź od API PayU:" + JSON.stringify(response));
+    
+      if (response.status === 401) {
+        alert("Błąd autoryzacji: Sprawdź token dostępu");
+      } else if (response.status >= 200 && response.status < 300) {
+        alert("Zamówienie zostało pomyślnie złożone!");
+      } else {
+        alert("Nieoczekiwany status odpowiedzi:" + JSON.stringify(response.status));
+        alert(`Wystąpił problem: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Błąd podczas komunikacji z PayU: ", error);
+      alert("Błąd podczas wysyłania zapytania do PayU. Zobacz konsolę.");
     }
-
-    alert("Otrzymano odpowiedź od API PayU:" + JSON.stringify(response));
-
-    if (response.status >= 200 && response.status < 300) {
-      alert("Zamówienie zostało pomyślnie złożone!");
-
-      alert("Zamówienie zostało pomyślnie złożone!");
-    } else {
-      alert("Nieoczekiwany status odpowiedzi:" + JSON.stringify(response.status));
-
-      alert(`Wystąpił problem: ${response.status}`);
-    }
-  };
+  }
 
   return (
     <main className="min-h-screen flex flex-col items-center p-4">
