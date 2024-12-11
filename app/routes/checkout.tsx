@@ -244,15 +244,6 @@ export default function Checkout() {
               <div className="justify-between gap-6 mt-4">
                 {filteredMethods.map((method: { name: string, brandImageUrl: string, value: string }, index: number) => (
                   <div key={index} className="p-1 rounded-lg flex flex-row text-center">
-                    <input
-                      type="radio"
-                      id={method.value}
-                      name="paymentMethod"
-                      value={method.value}
-                      checked={selectedPaymentMethod === method.value}
-                      onChange={() => handlePaymentMethodChange(method.value)}
-                      className="hidden"
-                    />
                     <label
                       htmlFor={method.value}
                       className={`cursor-pointer flex items-center justify-center p-2 rounded-lg border-2 ${
