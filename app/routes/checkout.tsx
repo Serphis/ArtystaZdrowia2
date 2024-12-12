@@ -44,11 +44,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const paymentMethods = paymentMethodsResponse.data;
 
-  return json({ cart: matchedItems, totalPrice, paymentMethods, uniqueOrderId, accessToken });
+  return json({ cart: matchedItems, totalPrice, paymentMethods, uniqueOrderId, accessToken, payuClient });
 };
 
 export default function Checkout() {
-  const { cart, totalPrice, paymentMethods, uniqueOrderId, accessToken } = useLoaderData();
+  const { cart, totalPrice, paymentMethods, uniqueOrderId, accessToken, payuClient } = useLoaderData();
 
   const [formData, setFormData] = useState({
     firstName: "",
