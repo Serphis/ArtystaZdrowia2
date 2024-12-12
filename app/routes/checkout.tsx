@@ -5,12 +5,17 @@ import { useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-
+import PayU from 'payu-websdk';
 
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
   const { matchedItems, totalPrice } = await getCartData(session);
   const uniqueOrderId = uuidv4();
+
+  const payuClient = new PayU({
+    key: process.env.PAYU_POS_ID,
+    salt: process.env.PAYU_SECOND_KEY,
+  }, "TEST");
 
   const client_id = process.env.PAYU_CLIENT_ID;
   const client_secret = process.env.PAYU_CLIENT_SECRET;
@@ -111,21 +116,16 @@ export default function Checkout() {
     };
 
     try {
-      const response = await fetch('/createOrder', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderData }),
-      });
-  
-      if (response.status === 200) {
-        const redirectUri = response.data.redirectUri;
-        window.location.href = redirectUri;
-      } else {
-        alert("Wystąpił problem z zamówieniem.");
-      }
+      // Inicjuj płatność za pomocą PayU
+      const paymentResponse = await payuClient.paymentInitiate(orderData);
+      console.log(paymentResponse);
+      
+      // Przekierowanie użytkownika na stronę płatności PayU
+      window.location.href = paymentResponse.redirectUri;
+      
     } catch (error) {
-      console.error('Błąd:', error);
-      alert("Wystąpił problem z przesyłaniem zamówienia.");
+      console.error('Błąd przy inicjowaniu płatności:', error);
+      alert("Wystąpił problem z płatnością.");
     }
   };
 
