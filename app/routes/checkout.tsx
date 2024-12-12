@@ -115,18 +115,18 @@ export default function Checkout() {
       }))
     };
 
-    try {
       // Inicjuj płatność za pomocą PayU
-      const paymentResponse = await payuClient.paymentInitiate(orderData);
-      console.log(paymentResponse);
-      
-      // Przekierowanie użytkownika na stronę płatności PayU
-      window.location.href = paymentResponse.redirectUri;
-      
-    } catch (error) {
-      console.error('Błąd przy inicjowaniu płatności:', error);
-      alert("Wystąpił problem z płatnością.");
-    }
+    axios.post('https://test.payu.in/merchant/postservice.php?form=2', orderData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
+    .then(response => {
+      console.log('Odpowiedź z PayU:', response.data);
+    })
+    .catch(error => {
+      console.log('Błąd płatności:', error);
+    });
   };
 
   return (
