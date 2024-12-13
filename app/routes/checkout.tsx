@@ -56,7 +56,7 @@ export default function Checkout() {
     };
   
     try {
-      const response = await axios.post('/api/create-order', data);
+      const response = await axios.post('./create-order', data);
   
       if (response.data.redirectUri) {
         window.location.href = response.data.redirectUri; // Przekierowanie do PayU
