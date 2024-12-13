@@ -58,7 +58,7 @@ const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             O firmie
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-black"></span>
           </Link>
-          <Link to="/productList" className="group transition duration-300">
+          <Link to="/productList/list" className="group transition duration-300">
             Produkty
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-black"></span>
           </Link>

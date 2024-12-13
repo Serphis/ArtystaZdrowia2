@@ -6,22 +6,28 @@ import { ActionFunction, redirect } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { addToCart, commitSession, getSession } from "../utils/session.server";
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-    const session = await getSession(request);
-    const products = await db.product.findMany({})
-    const { productId } = params;
-    const sizes = await db.size.findMany({
-    where: { productId: productId }
+export const loader: LoaderFunction = async ({ params }) => {
+    const { productId } = params;  // Odczytujemy dynamiczny parametr z URL
+    const Product = await db.product.findUnique({
+      where: { id: productId },
+      include: { sizes: true },  // Pobieramy dane o produkcie oraz dostępne rozmiary
     });
+    const sizes = await db.size.findMany({
+        where: { productId : productId },
+    })
 
-    return { session, products, sizes, productId };
-};
-
-
-export const action: ActionFunction = async ({ request, params }) => {
+  
+    if (!Product) {
+      throw new Error('Produkt nie znaleziony');
+    }
+  
+    return { Product, sizes };
+  };
+  
+export const action: ActionFunction = async ({ request }) => {
     const formData = await request.formData();
 
-    const productId = params.productId.toString();
+    const productId = formData.get("productId")?.toString();
     const sizeId = formData.get("sizeId")?.toString();
     const stock = formData.get("stock")?.toString();
     const price = formData.get("price")?.toString();
@@ -35,9 +41,9 @@ export const action: ActionFunction = async ({ request, params }) => {
 };
 
 export default function ProductInfo() {
-    const { products, sizes, productId } = useLoaderData();
+    const { Product, sizes, productId } = useLoaderData();
 
-    const Product = products.find((p) => p.id === productId);
+    // const Product = products.find((p) => p.id === productId);
     const AvailableSizes = sizes.filter((s) => s.stock > 0);
 
     const [selectedSize, setSelectedSize] = useState(AvailableSizes[0]?.id || null);

@@ -1,6 +1,8 @@
-const express = require('express');
+import express from 'express';
+import createOrder from '~/routes/create-order';
+
 const app = express();
-const createOrder = require('create-order');
+
 
 app.use(express.json());
 

@@ -3,6 +3,7 @@ import { useLoaderData } from '@remix-run/react';
 import { db } from '../services/index';
 import { Link } from 'react-router-dom';
 
+
 export const loader: LoaderFunction = async ({ request }) => {
   
   const products = await db.product.findMany({
@@ -33,8 +34,7 @@ export default function ProductList(){
                     return (
                       <div key={Product.id}>
                         <div className="flex flex-col w-60 md:w-80 ">
-                            <Link
-                                to={`/${Product.id}`}
+                          <Link to={`/productList/${Product.id}`}
                                 className="transition duration-500 ease-in-out hover:bg-slate-100 hover:text-slate-800 font-medium p-1 pb-2 rounded-2xl"
                                 >
                                 <div className="flex flex-col items-center">
