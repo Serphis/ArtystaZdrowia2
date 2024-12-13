@@ -14,25 +14,35 @@ export default function Checkout() {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
+    // Sprawdzenie, czy funkcja jest wywoływana
+    alert('Funkcja handleSubmit została wywołana!');  // To sprawi, że pojawi się okno alertu
+  
     try {
+      // To tylko przykładowa operacja, która na pewno coś zrobi
+      const formDataToSend = new URLSearchParams();
+      formDataToSend.append('email', 'test@example.com');  // Przykładowe dane
+      formDataToSend.append('totalAmount', '100');  // Przykładowa kwota
+  
+      // Fake request do serwera
       const response = await fetch('create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({
-          email: formData.email,
-          totalAmount: formData.totalAmount.toString(),
-        }).toString(),
+        body: formDataToSend.toString(),
       });
   
-      const data = await response.json(); // Sprawdzamy odpowiedź w formacie JSON
-      alert(JSON.stringify(data)); // Wyświetlamy całą odpowiedź z serwera w alert
+      // Sprawdzenie odpowiedzi
+      const data = await response.json();
+      alert('Odpowiedź z serwera: ' + JSON.stringify(data));
+  
     } catch (err) {
-      console.error('Błąd podczas wysyłania zapytania do create-order:', err);
+      // Jeżeli coś pójdzie nie tak, pokażemy alert z błędem
+      alert('Błąd w handleSubmit: ' + err.message);
     }
   };
   
+
   return (
     <form onSubmit={handleSubmit}>
       <label>
