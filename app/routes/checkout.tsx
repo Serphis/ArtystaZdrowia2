@@ -21,7 +21,7 @@ export default function Checkout() {
       formDataToSend.append('email', 'test@example.com');
       formDataToSend.append('totalAmount', '100');
       
-      const response = await fetch('create-order', {
+      const response = await fetch('/api/create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
