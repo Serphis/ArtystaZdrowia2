@@ -1,11 +1,11 @@
 const express = require('express');
 const app = express();
-const createOrder = require('./api/create-order');
+const createOrder = require('./create-order');
 
 app.use(express.json());
 
 // Routing do create-order
-app.post('/api/create-order', createOrder);
+app.post('./create-order', createOrder);
 
 // Start serwera
 app.listen(3000, () => {
