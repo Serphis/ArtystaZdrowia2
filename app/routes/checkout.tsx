@@ -13,17 +13,14 @@ export default function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Sprawdzenie, czy funkcja jest wywoływana
-    alert('Funkcja handleSubmit została wywołana!');  // To sprawi, że pojawi się okno alertu
-  
+    
+    alert('Funkcja handleSubmit została wywołana!');
+    
     try {
-      // To tylko przykładowa operacja, która na pewno coś zrobi
       const formDataToSend = new URLSearchParams();
-      formDataToSend.append('email', 'test@example.com');  // Przykładowe dane
-      formDataToSend.append('totalAmount', '100');  // Przykładowa kwota
-  
-      // Fake request do serwera
+      formDataToSend.append('email', 'test@example.com');
+      formDataToSend.append('totalAmount', '100');
+      
       const response = await fetch('create-order', {
         method: 'POST',
         headers: {
@@ -32,12 +29,9 @@ export default function Checkout() {
         body: formDataToSend.toString(),
       });
   
-      // Sprawdzenie odpowiedzi
-      const data = await response.json();
-      alert('Odpowiedź z serwera: ' + JSON.stringify(data));
-  
+      const text = await response.text();
+      alert('Odpowiedź z serwera: ' + text);
     } catch (err) {
-      // Jeżeli coś pójdzie nie tak, pokażemy alert z błędem
       alert('Błąd w handleSubmit: ' + err.message);
     }
   };
