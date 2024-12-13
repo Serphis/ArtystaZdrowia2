@@ -57,7 +57,7 @@ export default function Checkout() {
       currency_code: "PLN",
       country: "PL",
       customer_ip: "127.0.0.1", // Możesz tu użyć rzeczywistego IP użytkownika, jeśli to możliwe
-      product_name: "Your Product Name", // Nazwa produktu
+      product_name: "swieczka", // Nazwa produktu
       total_tax: 0, // Podatek jeśli jest
       shipping_cost: shippingCost * 100, // Koszt wysyłki w groszach
       first_name: formData.firstName,
@@ -70,8 +70,11 @@ export default function Checkout() {
       terms_accepted: formData.termsAccepted,
     });
 
-    // Wywołanie metody SDK, aby utworzyć transakcję
-    payu.createOrder().then((response) => {
+    alert(`Dane do PayU: \n${JSON.stringify(payu, null, 2)}`);
+
+    const payuInstance = new PayU(payu);
+
+    payuInstance.createOrder().then((response) => {
       if (response.status === "success") {
         // Jeśli transakcja jest pomyślna, przekieruj do PayU
         window.location.href = response.redirect_url;
