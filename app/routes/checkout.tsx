@@ -26,14 +26,13 @@ export default function Checkout() {
         }).toString(),
       });
   
-      const { token } = await response.json(); // Założenie, że backend zwraca token
-  
-      alert(`Token: ${token}`); // Wypisanie tokenu w alert
+      const data = await response.json(); // Sprawdzamy odpowiedź w formacie JSON
+      alert(JSON.stringify(data)); // Wyświetlamy całą odpowiedź z serwera w alert
     } catch (err) {
-      console.error('Błąd podczas tworzenia zamówienia:', err);
+      console.error('Błąd podczas wysyłania zapytania do create-order:', err);
     }
   };
-
+  
   return (
     <form onSubmit={handleSubmit}>
       <label>
