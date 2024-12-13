@@ -48,6 +48,25 @@ export default function Checkout() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    alert(`client_id: ${process.env.PAYU_CLIENT_ID}`);
+    alert(`client_secret: ${process.env.PAYU_CLIENT_SECRET}`);
+    alert(`order_id: ${formData.orderId}`);
+    alert(`total_amount: ${(totalPrice + shippingCost) * 100}`);
+    alert(`currency_code: PLN`);
+    alert(`country: PL`);
+    alert(`customer_ip: 127.0.0.1`);
+    alert(`product_name: swieczka`);
+    alert(`total_tax: 0`);
+    alert(`shipping_cost: ${shippingCost * 100}`);
+    alert(`first_name: ${formData.firstName}`);
+    alert(`last_name: ${formData.lastName}`);
+    alert(`email: ${formData.email}`);
+    alert(`phone: ${formData.phone}`);
+    alert(`address: ${formData.streetAddress1}`);
+    alert(`postal_code: ${formData.postalCode}`);
+    alert(`city: ${formData.city}`);
+    alert(`terms_accepted: ${formData.termsAccepted}`);
+  
     // Przekazywanie danych do PayU WebSDK
     const payu = new PayU({
       client_id: process.env.PAYU_CLIENT_ID!,
