@@ -13,27 +13,22 @@ export default function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
-      const formDataToSend = new URLSearchParams();
-      formDataToSend.append('email', formData.email);
-      formDataToSend.append('totalAmount', formData.totalAmount.toString());
-
       const response = await fetch('create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: formDataToSend.toString(),
+        body: new URLSearchParams({
+          email: formData.email,
+          totalAmount: formData.totalAmount.toString(),
+        }).toString(),
       });
-
-      const { redirectUri } = await response.json();
-
-      if (redirectUri) {
-        window.location.href = redirectUri; // Przekierowanie do PayU
-      } else {
-        console.error('Brak odpowiedzi z backendu.');
-      }
+  
+      const { token } = await response.json(); // Założenie, że backend zwraca token
+  
+      alert(`Token: ${token}`); // Wypisanie tokenu w alert
     } catch (err) {
       console.error('Błąd podczas tworzenia zamówienia:', err);
     }
