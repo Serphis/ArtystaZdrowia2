@@ -85,7 +85,7 @@ export default function Checkout() {
     const customerIp = ipResponse.data;
 
     try {
-      const response = await axios.post('../payu', {
+      const response = await axios.post('../utils/payu', {
         formData,
         cart,
         totalAmount,

@@ -107,7 +107,6 @@ export const checkOrderStatus = async (orderId: string) => {
   }
 };
 
-// Funkcja do anulowania zamówienia
 export const cancelOrder = async (orderId: string) => {
   const accessToken = await getAccessToken();
   
