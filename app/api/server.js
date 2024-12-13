@@ -1,11 +1,11 @@
 const express = require('express');
 const app = express();
-const createOrder = require('./create-order');
+const createOrder = require('artystazdrowia.com/create-order');
 
 app.use(express.json());
 
 // Routing do create-order
-app.post('./create-order', createOrder);
+app.post('artystazdrowia.com/create-order', createOrder);
 
 // Start serwera
 app.listen(3000, () => {
