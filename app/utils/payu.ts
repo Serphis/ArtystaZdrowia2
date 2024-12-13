@@ -79,6 +79,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(200).json(paymentResponse.data);
     } catch (error: any) {
       const errorMessage = errorUtils.getError(error);
+      const errorMessage2 = error.response ? error.response.data.error : error.message;
+      alert(`Wystąpił błąd: ${errorMessage2}`);
       console.error(errorMessage);
       res.status(500).json({ error: errorMessage });
     }
