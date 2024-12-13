@@ -1,4 +1,6 @@
-import { Link } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
+import { useUser } from "./UserContext";
+import React from "react";
 
 function Login(props) {
   return <Link to="/login" className="text-sm sm:text-base font-light">ZALOGUJ SIĘ</Link>;
@@ -18,8 +20,16 @@ export function HandleLogin(props){
   return <Login />;
 }
 
-const DefaultLayout: React.FC<{ children: React.ReactNode, userId: string | null, isAdmin?: boolean | null }> = ({ children, userId, isAdmin }) => {
+const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { userId, isAdmin, setUserData } = useUser();
+  const { userId: loaderUserId, isAdmin: loaderIsAdmin } = useLoaderData();
 
+  React.useEffect(() => {
+    if (loaderUserId && loaderIsAdmin !== undefined) {
+      setUserData(loaderUserId, loaderIsAdmin);
+    }
+  }, [loaderUserId, loaderIsAdmin, setUserData]);
+  
   return (
     <div className="min-h-screen flex flex-col font-tenor">
       <header className="z-30 shadow-sm sticky top-0">

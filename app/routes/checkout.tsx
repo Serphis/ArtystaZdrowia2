@@ -12,19 +12,11 @@ export const loader: LoaderFunction = async ({ request }) => {
   const { matchedItems, totalPrice } = await getCartData(session);
   const uniqueOrderId = uuidv4();
 
-  const payuClient = new PayU({
-    key: process.env.PAYU_POS_ID,
-    salt: process.env.PAYU_SECOND_KEY,
-  }, "TEST");
-
-  const client_id = process.env.PAYU_CLIENT_ID;
-  const client_secret = process.env.PAYU_CLIENT_SECRET;
-
   const url = 'https://secure.snd.payu.com/pl/standard/user/oauth/authorize';
-  const data = new URLSearchParams();
-  data.append('grant_type', 'client_credentials');
-  data.append('client_id', client_id);
-  data.append('client_secret', client_secret);
+    const data = new URLSearchParams();
+    data.append('grant_type', 'client_credentials');
+    data.append('client_id', process.env.PAYU_CLIENT_ID!);
+    data.append('client_secret', process.env.PAYU_CLIENT_SECRET!);
 
   const response = await axios.post(url, data, {
     headers: {
@@ -44,11 +36,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const paymentMethods = paymentMethodsResponse.data;
 
-  return json({ cart: matchedItems, totalPrice, paymentMethods, uniqueOrderId, accessToken, payuClient });
+  return json({ cart: matchedItems, totalPrice, paymentMethods, uniqueOrderId });
 };
 
 export default function Checkout() {
-  const { cart, totalPrice, paymentMethods, uniqueOrderId, accessToken, payuClient } = useLoaderData();
+  const { cart, totalPrice, paymentMethods, uniqueOrderId } = useLoaderData();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -89,44 +81,17 @@ export default function Checkout() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const ipResponse = await axios.get("https://api.ipify.org");
-    const customerIp = ipResponse.data;
-
-    const orderData = {
-      notifyUrl: 'https://artystazdrowia.com/notify', // Adres do odbierania powiadomień o płatności
-      redirectUri: "https://artystazdrowia.com/return",
-      customerIp: customerIp,
-      merchantPosId: process.env.PAYU_POS_ID, // Identyfikator punktu sprzedaży
-      description: 'Zamówienie z Artysta Zdrowia', // Opis zamówienia
-      currencyCode: 'PLN', // Waluta zgodna z ISO 4217
-      totalAmount: totalAmount,
-      extOrderId: uniqueOrderId, // Unikalny identyfikator zamówienia (np. generowany na backendzie)
-      buyer: {
-        email: formData.email, // Adres email klienta
-        phone: formData.phone, // Numer telefonu klienta
-        firstName: formData.firstName, // Imię klienta
-        lastName: formData.lastName, // Nazwisko klienta
-        language: 'pl', // Język
-      },
-      products: Object.keys(cart).map((key) => ({
-        name: cart[key].name, // Nazwa produktu
-        unitPrice: String(cart[key].sizePrice * 100), // Cena jednostkowa w groszach
-        quantity: cart[key].quantity // Ilość produktów
-      }))
-    };
-
-      // Inicjuj płatność za pomocą PayU
-    axios.post('https://test.payu.in/merchant/postservice.php?form=2', orderData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    })
-    .then(response => {
-      console.log('Odpowiedź z PayU:', response.data);
-    })
-    .catch(error => {
-      console.log('Błąd płatności:', error);
-    });
+    try {
+      const response = await axios.post('../payu', {
+        formData,
+        cart,
+        totalAmount,
+      });
+  
+      console.log('Odpowiedź z backendu:', response.data);
+    } catch (error) {
+      console.error('Błąd:', error);
+    }
   };
 
   return (

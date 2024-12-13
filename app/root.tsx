@@ -12,6 +12,7 @@ import DefaultLayout from "./layouts/DefaultLayout"; // Poprawny import layoutu
 import { getUserSession } from "./utils/auth.server";
 import { db } from './services/index';  // Adjust path accordingly
 import { json, LoaderFunction, redirect } from "@remix-run/node";
+import { UserProvider } from "./layouts/UserContext";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -41,15 +42,10 @@ export const loader: LoaderFunction = async ({ request }) => {
     return { userId: null, isAdmin: false };
   }
 
-  return { userId: sessionData.userId, isAdmin: user.isAdmin };
+  return json({ userId: sessionData.userId, isAdmin: user.isAdmin });
 };
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  
-  let userId = null;
-  let isAdmin = false;
-  
-  const user = { userId, isAdmin } = useLoaderData() || { userId: null, isAdmin: false };
 
   return (
     <html lang="en">
@@ -65,11 +61,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <script src="https://geowidget.easypack24.net/js/sdk-for-javascript.js"></script>
       </head>
       <body>
-        <DefaultLayout userId={user.userId} isAdmin={user.isAdmin}>
-          {children}
-          <ScrollRestoration />
-          <Scripts />
-        </DefaultLayout>
+        <UserProvider>
+          <DefaultLayout>
+            {children}
+            <ScrollRestoration />
+            <Scripts />
+          </DefaultLayout>
+        </UserProvider>
       </body>
     </html>
   );

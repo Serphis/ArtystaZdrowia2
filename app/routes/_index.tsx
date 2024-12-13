@@ -17,6 +17,7 @@ const HorizontalLine: React.FC<{ width: string }> = ({ width }) => {
 };
 
 export default function Index() {
+  
   return (
     <div className="bg-white font-light tracking-widest">
       <section className="text-center pt-12 flex flex-row justify-center">
