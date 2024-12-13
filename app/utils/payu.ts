@@ -1,144 +1,76 @@
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
-import PayU from 'payu-websdk';
 
-// Funkcja pomocnicza do obsługi błędów
-export const errorUtils = {
-  getError: (error: any) => {
-    let e = error;
-    if (error.response) {
-      e = error.response.data;
-      if (error.response.data && error.response.data.error) {
-        e = error.response.data.error;
-      }
-    } else if (error.message) {
-      e = error.message;
-    } else {
-      e = 'Nieznany błąd';
-    }
-    return e;
-  },
-};
+const PAYU_API_URL = 'https://secure.snd.payu.com/api/v2_1';
+const PAYU_CLIENT_ID = process.env.PAYU_CLIENT_ID!;
+const PAYU_CLIENT_SECRET = process.env.PAYU_CLIENT_SECRET!;
 
-// Funkcja do uzyskania tokenu dostępu OAuth
-export const getAccessToken = async () => {
-  const url = 'https://secure.snd.payu.com/pl/standard/user/oauth/authorize';
+// Funkcja do uzyskania tokenu dostępu
+export async function getPayUAccessToken() {
+  const url = `${PAYU_API_URL}/oauth/authorize`;
   const data = new URLSearchParams();
   data.append('grant_type', 'client_credentials');
-  data.append('client_id', process.env.PAYU_CLIENT_ID!);
-  data.append('client_secret', process.env.PAYU_CLIENT_SECRET!);
+  data.append('client_id', PAYU_CLIENT_ID);
+  data.append('client_secret', PAYU_CLIENT_SECRET);
 
-  try {
-    const response = await axios.post(url, data, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    });
-    return response.data.access_token;
-  } catch (error: any) {
-    throw new Error(errorUtils.getError(error));
-  }
-};
+  const response = await axios.post(url, data, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
 
-// Funkcja do tworzenia zamówienia
-export const createOrder = async (
-  formData: any,
-  cart: any,
-  totalAmount: number,
-  customerIp: string
-) => {
-  const accessToken = await getAccessToken();
-  
+  return response.data.access_token;
+}
+
+// Funkcja do utworzenia zamówienia w PayU
+export async function createPayUOrder(orderDetails: any) {
+  const accessToken = await getPayUAccessToken();
+
+  const url = `${PAYU_API_URL}/orders`;
+
   const orderData = {
-    notifyUrl: 'https://artystazdrowia.com/notify',
-    redirectUri: 'https://artystazdrowia.com/return',
-    customerIp: customerIp,
-    merchantPosId: process.env.PAYU_POS_ID!,
-    description: 'Zamówienie z Artysta Zdrowia',
+    notifyUrl: 'https://artystazdrowia.com/notify',  // URL do powiadomienia po zakończeniu płatności
+    continueUrl: 'https://artystazdrowia.com/return',  // URL do kontynuowania po płatności
+    customerIp: orderDetails.customerIp,
+    merchantPosId: PAYU_CLIENT_ID,  // ID sklepu
+    description: `Zamówienie nr ${orderDetails.orderId}`,  // Opis zamówienia
     currencyCode: 'PLN',
-    totalAmount: totalAmount,
-    extOrderId: uuidv4(),
+    totalAmount: orderDetails.totalAmount,  // Kwota całkowita w groszach
+    extOrderId: orderDetails.orderId,  // Unikalny ID zamówienia
     buyer: {
-      email: formData.email,
-      phone: formData.phone,
-      firstName: formData.firstName,
-      lastName: formData.lastName,
+      email: orderDetails.buyerEmail,
+      phone: orderDetails.buyerPhone,
+      firstName: orderDetails.buyerFirstName,
+      lastName: orderDetails.buyerLastName,
       language: 'pl',
     },
-    products: Object.keys(cart).map((key: string) => ({
-      name: cart[key].name,
-      unitPrice: String(cart[key].sizePrice * 100),
-      quantity: cart[key].quantity,
+    products: orderDetails.products.map((product: any) => ({
+      name: product.name,
+      unitPrice: product.unitPrice,  // Cena jednostkowa w groszach
+      quantity: product.quantity,  // Ilość
     })),
   };
 
-  try {
-    const response = await axios.post(
-      'https://secure.snd.payu.com/api/v2_1/orders',
-      orderData,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error: any) {
-    throw new Error(errorUtils.getError(error));
-  }
-};
+  const response = await axios.post(url, orderData, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  });
 
-// Funkcja do sprawdzania statusu zamówienia
-export const checkOrderStatus = async (orderId: string) => {
-  const accessToken = await getAccessToken();
-  
-  try {
-    const response = await axios.get(
-      `https://secure.snd.payu.com/api/v2_1/orders/${orderId}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error: any) {
-    throw new Error(errorUtils.getError(error));
-  }
-};
+  return response.data;
+}
 
-export const cancelOrder = async (orderId: string) => {
-  const accessToken = await getAccessToken();
-  
-  try {
-    const response = await axios.delete(
-      `https://secure.snd.payu.com/api/v2_1/orders/${orderId}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error: any) {
-    throw new Error(errorUtils.getError(error));
-  }
-};
+// Funkcja do potwierdzenia płatności
+export async function confirmPayment(paymentId: string) {
+  const accessToken = await getPayUAccessToken();
 
-// Funkcja obsługująca powiadomienia (notifyUrl)
-export const handleNotification = (req: any, res: any) => {
-  const notificationData = req.body;
-  const orderId = notificationData.orderId;
-  
-  // Zapisz status zamówienia lub wykonaj inne operacje
-  checkOrderStatus(orderId)
-    .then(orderStatus => {
-      // Przetwarzanie statusu zamówienia
-      console.log('Status zamówienia:', orderStatus);
-      res.status(200).send('OK');
-    })
-    .catch((error) => {
-      res.status(500).send(error.message);
-    });
-};
+  const url = `${PAYU_API_URL}/payments/${paymentId}/status`;
+
+  const response = await axios.get(url, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  });
+
+  return response.data;
+}

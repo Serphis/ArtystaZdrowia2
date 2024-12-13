@@ -43,6 +43,9 @@ export default function Checkout() {
   const { cart, totalPrice, paymentMethods, uniqueOrderId } = useLoaderData();
 
   const [formData, setFormData] = useState({
+    orderId: uniqueOrderId,
+    customerIp: "",
+    totalAmount: totalPrice,
     firstName: "",
     lastName: "",
     country: "Polska",
@@ -60,7 +63,7 @@ export default function Checkout() {
   const grandTotal = (totalPrice + shippingCost).toFixed(2);
   const totalAmount = String(Math.round((totalPrice + shippingCost) * 100));
 
-    const handleChange = (e) => {
+  const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -77,7 +80,7 @@ export default function Checkout() {
   const handlePaymentMethodChange = (methodValue: string) => {
     setSelectedPaymentMethod(methodValue);
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -85,13 +88,13 @@ export default function Checkout() {
     const customerIp = ipResponse.data;
 
     try {
-      const response = await axios.post('../utils/payu', {
+      const response = await axios.post('/utils/payu', {
         formData,
         cart,
         totalAmount,
         customerIp,
       });
-  
+
       console.log('Odpowiedź z backendu:', response.data);
     } catch (error) {
       console.error('Błąd:', error);
@@ -103,93 +106,28 @@ export default function Checkout() {
       <h1 className="text-2xl font-bold mb-4">Podsumowanie zamówienia</h1>
 
       <form onSubmit={handleSubmit} className="w-full max-w-xl space-y-4">
+        {/* Dane kontaktowe */}
         <fieldset className="space-y-2">
           <legend className="text-lg font-medium">Dane kontaktowe</legend>
-          <input
-            type="text"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            placeholder="Imię*"
-            required
-            className="w-full p-2 border rounded"
-          />
-          <input
-            type="text"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            placeholder="Nazwisko*"
-            required
-            className="w-full p-2 border rounded"
-          />
-          <input
-            type="text"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Adres e-mail*"
-            required
-            className="w-full p-2 border rounded"
-          />
-          <input
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            placeholder="Numer telefonu*"
-            required
-            className="w-full p-2 border rounded"
-          />
+          <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Imię*" required className="w-full p-2 border rounded" />
+          <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Nazwisko*" required className="w-full p-2 border rounded" />
+          <input type="text" name="email" value={formData.email} onChange={handleChange} placeholder="Adres e-mail*" required className="w-full p-2 border rounded" />
+          <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Numer telefonu*" required className="w-full p-2 border rounded" />
         </fieldset>
 
+        {/* Adres dostawy */}
         <fieldset className="space-y-2">
           <legend className="text-lg font-medium">Adres dostawy</legend>
-          <select
-            name="country"
-            value={formData.country}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-          >
+          <select name="country" value={formData.country} onChange={handleChange} className="w-full p-2 border rounded">
             <option value="Polska">Polska</option>
           </select>
-          <input
-            type="text"
-            name="streetAddress1"
-            value={formData.streetAddress1}
-            onChange={handleChange}
-            placeholder="Ulica i numer budynku/lokalu*"
-            required
-            className="w-full p-2 border rounded"
-          />
-          <input
-            type="text"
-            name="streetAddress2"
-            value={formData.streetAddress2}
-            onChange={handleChange}
-            placeholder="Ciąg dalszy adresu (opcjonalnie)"
-            className="w-full p-2 border rounded"
-          />
-          <input
-            type="text"
-            name="postalCode"
-            value={formData.postalCode}
-            onChange={handleChange}
-            placeholder="Kod pocztowy*"
-            required
-            className="w-full p-2 border rounded"
-          />
-          <input
-            type="text"
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            placeholder="Miasto*"
-            required
-            className="w-full p-2 border rounded"
-          />
+          <input type="text" name="streetAddress1" value={formData.streetAddress1} onChange={handleChange} placeholder="Ulica i numer budynku/lokalu*" required className="w-full p-2 border rounded" />
+          <input type="text" name="streetAddress2" value={formData.streetAddress2} onChange={handleChange} placeholder="Ciąg dalszy adresu (opcjonalnie)" className="w-full p-2 border rounded" />
+          <input type="text" name="postalCode" value={formData.postalCode} onChange={handleChange} placeholder="Kod pocztowy*" required className="w-full p-2 border rounded" />
+          <input type="text" name="city" value={formData.city} onChange={handleChange} placeholder="Miasto*" required className="w-full p-2 border rounded" />
         </fieldset>
 
+        {/* Twoje zamówienie */}
         <section className="space-y-2">
           <h2 className="text-lg font-medium">Twoje zamówienie</h2>
           {Object.values(cart).map((item, index) => (
@@ -208,34 +146,23 @@ export default function Checkout() {
           </div>
         </section>
 
-            <div>
-              <h2 className="text-xl font-semibold">Wybierz metodę płatności</h2>
-              <div className="justify-between gap-6 mt-4">
-                {filteredMethods.map((method: { name: string, brandImageUrl: string, value: string }, index: number) => (
-                  <div key={index} className="p-1 rounded-lg flex flex-row text-center">
-                    <label
-                      htmlFor={method.value}
-                      className={`cursor-pointer flex items-center justify-center p-2 rounded-lg border-2 ${
-                        selectedPaymentMethod === method.value ? 'border-blue-500' : 'border-gray-300'
-                      }`}
-                    >
-                      <img src={method.brandImageUrl} alt={method.name} width={50} className="mr-2" />
-                      <span className="font-semibold">{method.name}</span>
-                      <input
-                        type="radio"
-                        id={method.value}
-                        name="paymentMethod"
-                        value={method.value}
-                        checked={selectedPaymentMethod === method.value}
-                        onChange={() => handlePaymentMethodChange(method.value)}
-                        className="ml-2"
-                      />
-                    </label>
-                  </div>
-                ))}
+        {/* Wybór metody płatności */}
+        <div>
+          <h2 className="text-xl font-semibold">Wybierz metodę płatności</h2>
+          <div className="justify-between gap-6 mt-4">
+            {filteredMethods.map((method: { name: string, brandImageUrl: string, value: string }, index: number) => (
+              <div key={index} className="p-1 rounded-lg flex flex-row text-center">
+                <label htmlFor={method.value} className={`cursor-pointer flex items-center justify-center p-2 rounded-lg border-2 ${selectedPaymentMethod === method.value ? 'border-blue-500' : 'border-gray-300'}`}>
+                  <img src={method.brandImageUrl} alt={method.name} width={50} className="mr-2" />
+                  <span className="font-semibold">{method.name}</span>
+                  <input type="radio" id={method.value} name="paymentMethod" value={method.value} checked={selectedPaymentMethod === method.value} onChange={() => handlePaymentMethodChange(method.value)} className="ml-2" />
+                </label>
               </div>
-            </div>
-            
+            ))}
+          </div>
+        </div>
+
+        {/* Regulamin */}
         <fieldset className="space-y-2">
           <legend className="text-lg font-medium">Regulamin</legend>
           <p className="text-sm">
@@ -244,23 +171,12 @@ export default function Checkout() {
             których mówi nasza polityka prywatności.
           </p>
           <label className="flex items-center">
-            <input
-              type="checkbox"
-              name="termsAccepted"
-              checked={formData.termsAccepted}
-              onChange={handleChange}
-              required
-              className="mr-2"
-            />
+            <input type="checkbox" name="termsAccepted" checked={formData.termsAccepted} onChange={handleChange} required className="mr-2" />
             Przeczytałem/am i akceptuję regulamin*
           </label>
         </fieldset>
 
-        <button
-          type="submit"
-          className="w-full p-2 text-lg font-medium text-white bg-black rounded"
-          disabled={!formData.termsAccepted}
-        >
+        <button type="submit" className="w-full p-2 text-lg font-medium text-white bg-black rounded" disabled={!formData.termsAccepted}>
           Kupuję i płacę
         </button>
       </form>
