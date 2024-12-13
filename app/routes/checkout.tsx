@@ -47,62 +47,41 @@ export default function Checkout() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    alert(`client_id: ${process.env.PAYU_CLIENT_ID}`);
-    alert(`client_secret: ${process.env.PAYU_CLIENT_SECRET}`);
-    alert(`order_id: ${formData.orderId}`);
-    alert(`total_amount: ${(totalPrice + shippingCost) * 100}`);
-    alert(`currency_code: PLN`);
-    alert(`country: PL`);
-    alert(`customer_ip: 127.0.0.1`);
-    alert(`product_name: swieczka`);
-    alert(`total_tax: 0`);
-    alert(`shipping_cost: ${shippingCost * 100}`);
-    alert(`first_name: ${formData.firstName}`);
-    alert(`last_name: ${formData.lastName}`);
-    alert(`email: ${formData.email}`);
-    alert(`phone: ${formData.phone}`);
-    alert(`address: ${formData.streetAddress1}`);
-    alert(`postal_code: ${formData.postalCode}`);
-    alert(`city: ${formData.city}`);
-    alert(`terms_accepted: ${formData.termsAccepted}`);
   
     // Przekazywanie danych do PayU WebSDK
-    const payu = new PayU({
-      client_id: process.env.PAYU_CLIENT_ID!,
-      client_secret: process.env.PAYU_CLIENT_SECRET!,
-      order_id: formData.orderId,
-      total_amount: (totalPrice + shippingCost) * 100, // Kwota musi być w groszach
-      currency_code: "PLN",
-      country: "PL",
-      customer_ip: "127.0.0.1", // Możesz tu użyć rzeczywistego IP użytkownika, jeśli to możliwe
-      product_name: "swieczka", // Nazwa produktu
-      total_tax: 0, // Podatek jeśli jest
-      shipping_cost: shippingCost * 100, // Koszt wysyłki w groszach
-      first_name: formData.firstName,
-      last_name: formData.lastName,
+    const orderData = {
+      orderId: formData.orderId,
+      totalAmount: formData.totalAmount + shippingCost * 100,  // Kwota w groszach
+      shippingCost: shippingCost * 100,  // Koszt wysyłki w groszach
+      firstName: formData.firstName,
+      lastName: formData.lastName,
       email: formData.email,
       phone: formData.phone,
-      address: formData.streetAddress1,
-      postal_code: formData.postalCode,
+      streetAddress1: formData.streetAddress1,
+      postalCode: formData.postalCode,
       city: formData.city,
-      terms_accepted: formData.termsAccepted,
-    });
+      termsAccepted: formData.termsAccepted,
+    };
 
-    alert(`Dane do PayU: \n${JSON.stringify(payu, null, 2)}`);
-
-    const payuInstance = new PayU(payu);
-
-    payuInstance.createOrder().then((response) => {
-      if (response.status === "success") {
-        // Jeśli transakcja jest pomyślna, przekieruj do PayU
-        window.location.href = response.redirect_url;
-      } else {
-        console.error("Błąd podczas tworzenia zamówienia", response);
-      }
-    }).catch((error) => {
-      console.error("Błąd w komunikacji z PayU", error);
-    });
+    // Wysłanie danych do backendu
+    fetch('/api/create-order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orderData }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.redirect_url) {
+          window.location.href = data.redirect_url;  // Przekierowanie do PayU
+        } else {
+          console.error("Błąd podczas tworzenia zamówienia");
+        }
+      })
+      .catch(error => {
+        console.error("Błąd w komunikacji z backendem", error);
+      });
   };
 
   return (
