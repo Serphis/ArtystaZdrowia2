@@ -5,6 +5,7 @@ import { useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import PayU from "payu-websdk"; // Importujemy PayU WebSDK
+import axios from "axios";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
@@ -45,7 +46,7 @@ export default function Checkout() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
   
     // Przekazywanie danych do PayU WebSDK
