@@ -1,72 +1,64 @@
 import express from 'express';
+import axios from 'axios';
 import dotenv from 'dotenv';
-import bodyParser from 'body-parser';
 
-dotenv.config(); // Załadowanie zmiennych środowiskowych z pliku .env
+dotenv.config();
 
 const app = express();
-app.use(bodyParser.json()); // Middleware do parsowania JSON
+app.use(express.json());
 
-const PORT = import.meta.env.PORT || 5000;
+// Endpoint do utworzenia zamówienia w PayU
+app.post('/api/create-order', async (req, res) => {
+  const { totalAmount, firstName, lastName, email, streetAddress1, postalCode, city, phone } = req.body;
 
-// Endpoint do tworzenia zamówienia w PayU
-app.post('/api/create-order', (req, res) => {
-  const { orderData } = req.body;
-
-  // Pobranie zmiennych środowiskowych z pliku .env
-  const payuClientId = import.meta.env.PAYU_CLIENT_ID;
-  const payuClientSecret = import.meta.env.PAYU_CLIENT_SECRET;
-  const payuApiUrl = import.meta.env.PAYU_API_URL;
-
-  // Logika komunikacji z PayU - tutaj możesz dodać kod do połączenia z API PayU
-
-  // Przykład danych, które wysyłasz do PayU
-  const payuRequestData = {
-    client_id: payuClientId,
-    client_secret: payuClientSecret,
-    order_id: orderData.orderId,
-    total_amount: orderData.totalAmount,
-    currency_code: 'PLN',
-    country: 'PL',
-    customer_ip: '127.0.0.1',
-    product_name: 'swieczka',
-    total_tax: 0,
-    shipping_cost: orderData.shippingCost,
-    first_name: orderData.firstName,
-    last_name: orderData.lastName,
-    email: orderData.email,
-    phone: orderData.phone,
-    address: orderData.streetAddress1,
-    postal_code: orderData.postalCode,
-    city: orderData.city,
-    terms_accepted: orderData.termsAccepted,
-  };
-
-  // Symulacja żądania do PayU
-  function createPayuOrder(requestData) {
-    // Tutaj musisz wysłać zapytanie do PayU (np. za pomocą Axios, Fetch)
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          status: 'success',
-          redirect_url: 'https://payu.pl/redirect-url', // Przykładowy URL
-        });
-      }, 1000);
+  try {
+    const response = await axios.post('https://secure.payu.com/api/v2_1/orders', {
+      order: {
+        notify_url: process.env.PAYU_NOTIFY_URL,
+        customer_ip: req.ip,
+        merchant_pos_id: process.env.PAYU_POS_ID,
+        ext_order_id: `order-${Date.now()}`,
+        total_amount: totalAmount,
+        currency_code: 'PLN',
+        products: [
+          {
+            name: 'Produkt',
+            unit_price: totalAmount,
+            quantity: 1
+          }
+        ],
+        buyer: {
+          email: email,
+          phone: phone,
+          first_name: firstName,
+          last_name: lastName,
+          delivery_address: {
+            street: streetAddress1,
+            city: city,
+            postal_code: postalCode
+          }
+        }
+      }
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.PAYU_CLIENT_SECRET}`
+      }
     });
+
+    // Odpowiedź z PayU
+    if (response.data.status.status_code === 'SUCCESS') {
+      res.json({ redirect_url: response.data.redirect_uri });
+    } else {
+      res.status(500).json({ error: 'Błąd podczas tworzenia zamówienia' });
+    }
+  } catch (error) {
+    console.error('Błąd komunikacji z PayU', error);
+    res.status(500).json({ error: 'Błąd podczas komunikacji z PayU' });
   }
-
-  createPayuOrder(payuRequestData)
-    .then((response) => {
-      // Zwrócenie URL do przekierowania na frontend
-      res.json({ redirect_url: response.redirect_url });
-    })
-    .catch((error) => {
-      console.error('Błąd podczas komunikacji z PayU', error);
-      res.status(500).json({ error: 'Błąd płatności' });
-    });
 });
 
-// Uruchomienie serwera
-app.listen(PORT, () => {
-  console.log(`Serwer uruchomiony na porcie ${PORT}`);
+// Nasłuchiwanie na porcie
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Serwer działa na porcie ${port}`);
 });

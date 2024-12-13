@@ -49,39 +49,27 @@ export default function Checkout() {
     e.preventDefault();
   
     // Przekazywanie danych do PayU WebSDK
-    const orderData = {
-      orderId: formData.orderId,
-      totalAmount: formData.totalAmount + shippingCost * 100,  // Kwota w groszach
-      shippingCost: shippingCost * 100,  // Koszt wysyłki w groszach
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      phone: formData.phone,
-      streetAddress1: formData.streetAddress1,
-      postalCode: formData.postalCode,
-      city: formData.city,
-      termsAccepted: formData.termsAccepted,
-    };
-
-    // Wysłanie danych do backendu
-    fetch('/api/create-order', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ orderData }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.redirect_url) {
-          window.location.href = data.redirect_url;  // Przekierowanie do PayU
-        } else {
-          console.error("Błąd podczas tworzenia zamówienia");
-        }
-      })
-      .catch(error => {
-        console.error("Błąd w komunikacji z backendem", error);
+    try {
+      const response = await axios.post('/api/create-order', {
+        totalAmount: (totalPrice + shippingCost) * 100, // Kwota w groszach
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        streetAddress1: formData.streetAddress1,
+        postalCode: formData.postalCode,
+        city: formData.city,
+        phone: formData.phone,
       });
+
+      if (response.data.redirect_url) {
+        window.location.href = response.data.redirect_url; // Przekierowanie na stronę PayU
+      } else {
+        alert('Błąd podczas tworzenia zamówienia');
+      }
+    } catch (error) {
+      console.error('Błąd w komunikacji z backendem', error);
+      alert('Wystąpił błąd podczas składania zamówienia');
+    }
   };
 
   return (
