@@ -50,26 +50,21 @@ export default function Checkout() {
     e.preventDefault();
   
     // Przekazywanie danych do PayU WebSDK
+    const data = {
+      email: "test@przyklad.com", // przykładowy email
+      totalAmount: 10000, // 100 PLN w groszach
+    };
+  
     try {
-      const response = await axios.post('/api/create-order', {
-        totalAmount: (totalPrice + shippingCost) * 100, // Kwota w groszach
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        streetAddress1: formData.streetAddress1,
-        postalCode: formData.postalCode,
-        city: formData.city,
-        phone: formData.phone,
-      });
-
-      if (response.data.redirect_url) {
-        window.location.href = response.data.redirect_url; // Przekierowanie na stronę PayU
+      const response = await axios.post('/api/create-order', data);
+  
+      if (response.data.redirectUri) {
+        window.location.href = response.data.redirectUri; // Przekierowanie do PayU
       } else {
-        alert('Błąd podczas tworzenia zamówienia');
+        console.error("Brak adresu redirectUri od backendu.");
       }
-    } catch (error) {
-      console.error('Błąd w komunikacji z backendem', error);
-      alert('Wystąpił błąd podczas składania zamówienia');
+    } catch (err) {
+      console.error("Błąd przy tworzeniu zamówienia:", err);
     }
   };
 
