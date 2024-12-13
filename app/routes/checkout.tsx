@@ -19,7 +19,7 @@ export default function Checkout() {
       formDataToSend.append('email', formData.email);
       formDataToSend.append('totalAmount', formData.totalAmount.toString());
 
-      const response = await fetch('artystazdrowia.com/create-order', {
+      const response = await fetch('create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
