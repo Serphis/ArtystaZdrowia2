@@ -81,11 +81,15 @@ export default function Checkout() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const ipResponse = await axios.get("https://api.ipify.org");
+    const customerIp = ipResponse.data;
+
     try {
       const response = await axios.post('../payu', {
         formData,
         cart,
         totalAmount,
+        customerIp,
       });
   
       console.log('Odpowiedź z backendu:', response.data);
