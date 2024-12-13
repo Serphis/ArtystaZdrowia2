@@ -3,6 +3,23 @@ import { v4 as uuidv4 } from 'uuid';
 import { NextApiRequest, NextApiResponse } from 'next';
 import PayU from 'payu-websdk';
 
+export const errorUtils = {
+  getError: (error) => {
+    let e = error;
+    if (error.response) {
+      e = error.response.data;
+      if (error.response.data && error.response.data.error) {
+        e = error.response.data.error;
+      }
+    } else if (error.message) {
+      e = error.message;
+    } else {
+      e = "Unknown error occured";
+    }
+    return e;
+  },
+};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     try {
@@ -61,8 +78,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       res.status(200).json(paymentResponse.data);
     } catch (error: any) {
-      console.error(error);
-      res.status(500).json({ error: error.message });
+      const errorMessage = errorUtils.getError(error);
+      console.error(errorMessage);
+      res.status(500).json({ error: errorMessage });
     }
   } else {
     res.setHeader('Allow', ['POST']);
