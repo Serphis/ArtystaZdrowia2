@@ -3,10 +3,8 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 
 // Załaduj publiczny klucz Stripe (zamień na swój klucz testowy/produkcyjny)
-const stripePromise = process.env.NEXT_PUBLIC_PUBLICZNY_KLUCZ_STRIPE
-  ? loadStripe(process.env.NEXT_PUBLIC_PUBLICZNY_KLUCZ_STRIPE)
-  : null;
-  
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_PUBLICZNY_KLUCZ_STRIPE);
+
 const Checkout = () => {
   const handleCheckout = async () => {
     try {

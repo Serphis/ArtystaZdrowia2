@@ -2,13 +2,9 @@ import { json, redirect } from '@remix-run/node'; // Importujemy potrzebne funkc
 import Stripe from 'stripe';
 
 // Inicjalizuj Stripe z Twoim kluczem sekretnym
-if (!process.env.SEKRETNY_KLUCZ_STRIPE) {
-    throw new Error("Missing Stripe secret key in environment variables");
-  }
-  
-  const stripe = new Stripe(process.env.SEKRETNY_KLUCZ_STRIPE, {
-    apiVersion: '2024-11-20.acacia',
-  });
+const stripe = new Stripe(process.env.SEKRETNY_KLUCZ_STRIPE, {
+  apiVersion: '2024-11-20.acacia',
+});
 
 // Funkcja `action` obsługująca zapytanie POST
 export const action = async ({ request }: { request: Request }) => {
