@@ -1,24 +1,42 @@
 import React from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
+import { getCartData } from "./cart";
+import { getSession, commitSession } from "../utils/session.server";
+import { json, LoaderFunction } from '@remix-run/node';
+import { useLoaderData } from '@remix-run/react';
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const session = await getSession(request);
+
+  const { matchedItems, totalPrice } = await getCartData(session);
+
+  return json({ cart: matchedItems, totalPrice });
+};
+
 
 // Załaduj publiczny klucz Stripe (zamień na swój klucz testowy/produkcyjny)
 const stripePromise = loadStripe('pk_test_51QWDzLC66ozEbyTE3bWJdZCIgsFId1VpLZ35NaR67Xbn16UbxLJ9iEvYTinebp7KmbYncMmdlWRtchkGBjzuVH4o00NbPwKvop');
 
-const Checkout = () => {
+export default function Checkout() {
+
+  let { cart, totalPrice } = useLoaderData();
+
+  totalPrice *= 100;
+
   const handleCheckout = async () => {
     try {
+      const items = Object.values(cart).map(item => ({
+        id: `${item.name}-${item.sizeId}`, // Możesz użyć kombinacji nazwy i rozmiaru jako unikalnego id
+        quantity: parseInt(item.stock, 10), // Liczba sztuk na podstawie pola `stock`
+      }));
+  
       const response = await fetch('https://www.artystazdrowia.com/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          items: [
-            { id: 'swieczka-1', quantity: 1 }, // Przykładowy produkt 1
-            { id: 'swieczka-2', quantity: 2 }  // Przykładowy produkt 2
-          ],
-        }),
+        body: JSON.stringify({ items }),
       });
 
       // Sprawdzenie odpowiedzi HTTP
@@ -83,5 +101,3 @@ const Checkout = () => {
     </Elements>
   );
 };
-
-export default Checkout;
