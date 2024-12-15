@@ -8,7 +8,7 @@ const stripePromise = loadStripe('pk_test_51QWDzLC66ozEbyTE3bWJdZCIgsFId1VpLZ35N
 const Checkout = () => {
   const handleCheckout = async () => {
     try {
-      const response = await fetch('https://artystazdrowia.com/create-checkout-session', {
+      const response = await fetch('https://www.artystazdrowia.com/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
