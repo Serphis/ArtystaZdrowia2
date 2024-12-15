@@ -1,1 +1,1 @@
-declare module 'payu-websdk';
+// declare module 'payu-websdk';
