@@ -8,7 +8,7 @@ const stripePromise = loadStripe('pk_test_51QWDzLC66ozEbyTE3bWJdZCIgsFId1VpLZ35N
 const Checkout = () => {
   const handleCheckout = async () => {
     try {
-      const response = await fetch('/api/create-checkout-session', {
+      const response = await fetch('https://artystazdrowia.com/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -20,14 +20,37 @@ const Checkout = () => {
         }),
       });
 
-      const session = await response.json();
-
-      if (session.error) {
-        console.error(session.error);
-        alert('Błąd podczas tworzenia sesji płatności');
+      // Sprawdzenie odpowiedzi HTTP
+      if (!response.ok) {
+        console.error('Błąd HTTP:', response.status, response.statusText);
+        const responseClone = response.clone();
+        const errorText = await responseClone.text();
+        console.error('Treść odpowiedzi (HTML):', errorText);
+        alert('Błąd podczas tworzenia sesji płatności. Skontaktuj się z obsługą.');
         return;
       }
 
+      let session;
+      try {
+        // Próba parsowania odpowiedzi jako JSON
+        session = await response.json();
+      } catch (jsonError) {
+        const responseClone = response.clone();
+        const errorText = await responseClone.text();
+        console.error('Błąd parsowania JSON:', jsonError);
+        console.error('Treść odpowiedzi (HTML):', errorText);
+        alert('Błąd podczas przetwarzania danych płatności. Skontaktuj się z obsługą.');
+        return;
+      }
+
+      // Sprawdzenie, czy sesja zawiera błąd
+      if (session.error) {
+        console.error(session.error);
+        alert('Błąd podczas tworzenia sesji płatności: ' + session.error.message);
+        return;
+      }
+
+      // Pobranie Stripe i przekierowanie do płatności
       const stripe = await stripePromise;
       const { error } = await stripe?.redirectToCheckout({ sessionId: session.id });
 
@@ -36,8 +59,8 @@ const Checkout = () => {
         alert('Wystąpił błąd podczas przekierowania do płatności.');
       }
     } catch (error) {
-      console.error(error);
-      alert('Wystąpił błąd podczas obsługi płatności.');
+      console.error('Błąd podczas obsługi płatności:', error);
+      alert('Wystąpił błąd podczas obsługi płatności. Spróbuj ponownie później.');
     }
   };
 
