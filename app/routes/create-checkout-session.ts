@@ -2,7 +2,7 @@ import { json, redirect } from '@remix-run/node'; // Importujemy potrzebne funkc
 import Stripe from 'stripe';
 
 // Inicjalizuj Stripe z Twoim kluczem sekretnym
-const stripe = new Stripe(`${process.env.SEKRETNY_KLUCZ_STRIPE}`, {
+const stripe = new Stripe(`${process.env.VITE_PUBLICZNY_KLUCZ_STRIPE}`, {
   apiVersion: '2024-11-20.acacia',
 });
 
