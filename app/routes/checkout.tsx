@@ -15,7 +15,8 @@ const Checkout = () => {
         },
         body: JSON.stringify({
           items: [
-            { id: 'swieczka-1', quantity: 2 }, // Przykładowe dane produktu
+            { id: 'swieczka-1', quantity: 1 }, // Przykładowy produkt 1
+            { id: 'swieczka-2', quantity: 2 }  // Przykładowy produkt 2
           ],
         }),
       });
