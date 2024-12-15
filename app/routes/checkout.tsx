@@ -57,7 +57,7 @@ const Checkout = () => {
         alert('Stripe nie został poprawnie załadowany.');
         return;
       }
-      const { error } = await stripe?.redirectToCheckout({ sessionId: session.id });
+      const { error } = await stripe!.redirectToCheckout({ sessionId: session.id });
 
       if (error) {
         console.error(error.message);
