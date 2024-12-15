@@ -52,6 +52,10 @@ const Checkout = () => {
 
       // Pobranie Stripe i przekierowanie do płatności
       const stripe = await stripePromise;
+      if (!stripe) {
+        alert('Stripe nie został poprawnie załadowany.');
+        return;
+      }
       const { error } = await stripe?.redirectToCheckout({ sessionId: session.id });
 
       if (error) {
