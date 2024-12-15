@@ -20,16 +20,14 @@ const stripePromise = loadStripe('pk_test_51QWDzLC66ozEbyTE3bWJdZCIgsFId1VpLZ35N
 
 export default function Checkout() {
 
-  let { cart, totalPrice } = useLoaderData();
-
-  totalPrice *= 100;
+  let { cart } = useLoaderData();
 
   const handleCheckout = async () => {
     try {
       const items = Object.values(cart).map(item => ({
         id: `${item.name}-${item.sizeName}`, // Możesz użyć kombinacji nazwy i rozmiaru jako unikalnego id
         quantity: parseInt(item.stock, 10), // Liczba sztuk na podstawie pola `stock`
-        price: item.sizePrice
+        price: parseInt(item.sizePrice)*100,
       }));
   
       const response = await fetch('https://www.artystazdrowia.com/create-checkout-session', {
