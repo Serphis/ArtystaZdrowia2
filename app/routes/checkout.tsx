@@ -51,6 +51,8 @@ const Checkout = () => {
         return;
       }
 
+      alert(`${session.id}`)
+
       // Pobranie Stripe i przekierowanie do płatności
       const stripe = await stripePromise;
       if (!stripe) {

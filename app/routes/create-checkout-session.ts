@@ -44,7 +44,7 @@ export const action = async ({ request }: { request: Request }) => {
   return new Response('Method Not Allowed', { status: 405 });
 };
 
-// Opcjonalnie, jeśli chcesz obsługiwać stronę sukcesu lub anulowania, możesz dodać loadera
-export const loader = async () => {
-  return redirect('/'); // Przekierowanie na stronę główną lub inną stronę
-};
+// // Opcjonalnie, jeśli chcesz obsługiwać stronę sukcesu lub anulowania, możesz dodać loadera
+// export const loader = async () => {
+//   return redirect('/'); // Przekierowanie na stronę główną lub inną stronę
+// };
