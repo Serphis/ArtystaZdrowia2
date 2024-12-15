@@ -29,6 +29,7 @@ export default function Checkout() {
       const items = Object.values(cart).map(item => ({
         id: `${item.name}-${item.sizeName}`, // Możesz użyć kombinacji nazwy i rozmiaru jako unikalnego id
         quantity: parseInt(item.stock, 10), // Liczba sztuk na podstawie pola `stock`
+        price: item.sizePrice
       }));
   
       const response = await fetch('https://www.artystazdrowia.com/create-checkout-session', {
@@ -36,7 +37,7 @@ export default function Checkout() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ items, totalPrice }),
+        body: JSON.stringify({ items }),
       });
 
       // Sprawdzenie odpowiedzi HTTP
@@ -100,4 +101,4 @@ export default function Checkout() {
       </div>
     </Elements>
   );
-};
+}

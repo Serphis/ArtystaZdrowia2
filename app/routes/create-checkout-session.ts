@@ -13,13 +13,13 @@ export const action = async ({ request }: { request: Request }) => {
       const { items } = await request.json(); // Odbieramy dane z ciała zapytania (items)
   
       // Tworzymy linie zamówienia
-      const lineItems = items.map((item: { id: string; quantity: number }) => ({
+      const lineItems = items.map((item: { id: string; quantity: number; price: number }) => ({
         price_data: {
           currency: 'pln',
           product_data: {
             name: item.id, // Nazwa produktu np. "Świeczka zapachowa"
           },
-          unit_amount: 4999, // Cena w groszach (np. 49.99 zł)
+          unit_amount: item.price, // Cena w groszach (np. 49.99 zł)
         },
         quantity: item.quantity,
       }));

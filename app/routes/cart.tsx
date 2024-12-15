@@ -78,14 +78,9 @@ export const action: ActionFunction = async ({ request }) => {
       return json({ error: "Koszyk jest pusty." }, { status: 400 });
     }
 
-    const deliveryCost = 12.99;
-    const totalWithDelivery = totalPrice + deliveryCost;  
-
     session.set("order", {
       products: Object.values(matchedItems),
       totalPrice,
-      deliveryCost,
-      totalWithDelivery,
     });
   
     const commit = await commitSession(session);
@@ -114,9 +109,6 @@ export const action: ActionFunction = async ({ request }) => {
 
 export default function Cart() {
   const { matchedItems = {}, message, totalPrice } = useLoaderData();
-
-  const deliveryCost = 12.99; 
-  const totalWithDelivery = totalPrice + deliveryCost;
 
   const isCartEmpty = !matchedItems || Object.keys(matchedItems).length === 0;
 
@@ -164,36 +156,11 @@ export default function Cart() {
                 </div>
               </div>
             ))}
-            {/* Sekcja dostawy */}
-            <div className="pt-6">
-              <h2 className="text-lg sm:text-xl lg:text-2xl tracking-wider font-medium">
-                Opcje dostawy
-              </h2>
-              <div className="flex items-center space-x-2 mt-2">
-                <input
-                  type="radio"
-                  id="inpost-paczkomat"
-                  name="delivery"
-                  value="inpost-paczkomat"
-                  defaultChecked
-                  className="h-4 w-4"
-                />
-                <label htmlFor="inpost-paczkomat" className="text-base sm:text-lg">
-                  InPost Paczkomat - {deliveryCost.toFixed(2)} zł
-                </label>
-              </div>
-            </div>
 
             {/* Podsumowanie cen */}
             <div className="text-center pt-6">
-              <p className="text-lg sm:text-xl lg:text-2xl font-semibold">
-                Cena produktów: {totalPrice.toFixed(2)} zł
-              </p>
-              <p className="text-lg sm:text-xl lg:text-2xl font-semibold">
-                Koszt dostawy: {deliveryCost.toFixed(2)} zł
-              </p>
               <p className="text-xl sm:text-2xl lg:text-3xl font-bold mt-2">
-                Suma: {totalWithDelivery.toFixed(2)} zł
+                Suma: {totalPrice.toFixed(2)} zł
               </p>
             </div>
             
