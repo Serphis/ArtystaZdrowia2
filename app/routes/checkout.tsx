@@ -27,7 +27,7 @@ export default function Checkout() {
   const handleCheckout = async () => {
     try {
       const items = Object.values(cart).map(item => ({
-        id: `${item.name}-${item.sizeId}`, // Możesz użyć kombinacji nazwy i rozmiaru jako unikalnego id
+        id: `${item.name}-${item.sizeName}`, // Możesz użyć kombinacji nazwy i rozmiaru jako unikalnego id
         quantity: parseInt(item.stock, 10), // Liczba sztuk na podstawie pola `stock`
       }));
   
@@ -36,7 +36,7 @@ export default function Checkout() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({ items, totalPrice }),
       });
 
       // Sprawdzenie odpowiedzi HTTP
