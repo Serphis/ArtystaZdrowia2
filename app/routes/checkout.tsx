@@ -25,7 +25,7 @@ export default function Checkout() {
   const handleCheckout = async () => {
     try {
       const items = Object.values(cart).map(item => ({
-        id: `${item.name}-${item.sizeName}`, // Możesz użyć kombinacji nazwy i rozmiaru jako unikalnego id
+        id: `${item.name} - ${item.sizeName}`, // Możesz użyć kombinacji nazwy i rozmiaru jako unikalnego id
         quantity: parseInt(item.stock, 10), // Liczba sztuk na podstawie pola `stock`
         price: parseInt(item.sizePrice)*100,
       }));
@@ -88,14 +88,41 @@ export default function Checkout() {
 
   return (
     <Elements stripe={stripePromise}>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-        <h1 className="text-2xl font-bold mb-6">Podsumowanie zamówienia</h1>
-        <button
-          className="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600"
-          onClick={handleCheckout}
-        >
-          Zapłać
-        </button>
+      <div className="py-4 font-light flex flex-row space-x-4 sm:space-x-12 md:space-x-20 lg:space-x-32 justify-center">
+        <div className="rounded-md p-2">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl tracking-widest text-center px-2 pt-4 pb-4">
+            Podsumowanie zamówienia
+          </h1>
+          <div className="space-y-3 my-4">
+            {Object.values(cart).map((item, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between shadow-md rounded-lg ring-1 ring-black"
+              >
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm md:text-base w-28 sm:w-40 md:w-60 lg:w-80 lg:text-lg p-2 md:px-4 font-normal tracking-widest">
+                    {item.name}
+                  </span>
+                </div>
+                <div className="text-right mx-2">
+                  <p className="text-lg lg:text-xl font-semibold">
+                    {item.sizePrice} zł
+                  </p>
+                  <p className="text-sm lg:text-md">Ilość: {item.stock}</p>
+                  <p className="text-sm lg:text-md">Rozmiar: {item.sizeName}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-center">
+            <button
+              className="group transition duration-300 ease-in-out px-2 py-2 mb-2 text-l ring-1 ring-black hover:bg-black hover:text-white text-black bg-white rounded-sm shadow-md"
+              onClick={handleCheckout}
+            >
+              Zapłać
+            </button>
+          </div>
+        </div>
       </div>
     </Elements>
   );
