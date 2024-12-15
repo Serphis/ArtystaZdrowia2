@@ -29,8 +29,8 @@ export const action = async ({ request }: { request: Request }) => {
         payment_method_types: ['card', 'blik'], // Obsługiwane metody płatności
         line_items: lineItems,
         mode: 'payment',
-        success_url: `${new URL('/success', request.url)}`, // URL po udanej płatności
-        cancel_url: `${new URL('/cancel', request.url)}`, // URL po anulowaniu płatności
+        success_url: `${new URL('https://www.artystazdrowia.com//success', request.url)}`, // URL po udanej płatności
+        cancel_url: `${new URL('https://www.artystazdrowia.com//cancel', request.url)}`, // URL po anulowaniu płatności
       });
 
       // Zwracamy ID sesji Stripe
