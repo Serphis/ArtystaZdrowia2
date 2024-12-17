@@ -9,7 +9,7 @@ const stripe = new Stripe(`${process.env.SEKRETNY_KLUCZ_STRIPE}`, {
 export default async function handler( req: Request, res: Response ) {
   if (req.method === 'POST') {
     try {
-      const { items, 
+      const { 
         customerData,
         deliveryMethod,
         paymentMethod,
@@ -45,8 +45,8 @@ export default async function handler( req: Request, res: Response ) {
           payment_method_types: ['card', 'blik'],
           line_items: lineItems,
           mode: 'payment',
-          success_url: `${new URL('https://www.artystazdrowia.com/success', request.url)}`,
-          cancel_url: `${new URL('https://www.artystazdrowia.com/cancel', request.url)}`,
+          success_url: `${new URL('https://www.artystazdrowia.com/success', req.url)}`,
+          cancel_url: `${new URL('https://www.artystazdrowia.com/cancel', req.url)}`,
         });
 
         const order = await db.order.create({
