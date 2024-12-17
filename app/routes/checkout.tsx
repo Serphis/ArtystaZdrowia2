@@ -90,14 +90,7 @@ export default function Checkout() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          items,
-          customerData,
-          deliveryMethod,
-          paymentMethod,
-          totalPrice,
-          address,
-          parcelLocker,
-          cart,
+          items
         }),
       });
 
