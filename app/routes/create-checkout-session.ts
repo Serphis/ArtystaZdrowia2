@@ -9,8 +9,10 @@ const stripe = new Stripe(`${process.env.SEKRETNY_KLUCZ_STRIPE}`, {
 export const action = async ({ request }: { request: Request }) => {
   if (request.method === 'POST') {
     try {
-      const { items, address, receiverName, receiverPhone, deliveryMethod, paymentMethod, totalPrice, zipCode, parcelLocker } = await request.json();
+      const { items, orderData, parcelLocker } = await request.json();
   
+      console.log("AAAAAAAAAAAAAa", orderData)
+      
       const lineItems = items.map((item: { id: string; quantity: number; price: number }) => ({
         price_data: {
           currency: 'pln',

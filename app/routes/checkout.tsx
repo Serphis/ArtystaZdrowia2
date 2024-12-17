@@ -78,7 +78,7 @@ export default function Checkout() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ items, parcelLocker, customerData }),
+        body: JSON.stringify({ items, orderData, customerData }),
       });
 
       // Sprawdzenie odpowiedzi HTTP
