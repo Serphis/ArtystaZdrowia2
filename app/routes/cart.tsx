@@ -119,18 +119,18 @@ export default function Cart() {
           <h1 className="text-2xl md:text-3xl lg:text-4xl tracking-widest text-center px-2 pt-4 pb-4">
             Koszyk
           </h1>
-          <div className="flex justify-center">
-            <button
-              type="submit"
-              name="action"
-              value="clear"
-              className="group transition duration-300 ease-in-out px-2 py-2 mb-2 text-l ring-1 ring-black hover:bg-black hover:text-white text-black bg-white rounded-sm shadow-md"
-            >
-              Wyczyść koszyk
-            </button>
-          </div>
           {!isCartEmpty ? (
               <div className="space-y-3 my-4">
+                <div className="flex justify-center">
+                  <button
+                    type="submit"
+                    name="action"
+                    value="clear"
+                    className="group transition duration-300 ease-in-out px-2 py-2 mb-2 text-l ring-1 ring-black hover:bg-black hover:text-white text-black bg-white rounded-sm shadow-md"
+                  >
+                    Wyczyść koszyk
+                  </button>
+                </div>
               {Object.values(matchedItems).map((item, index) => (
                 <div
                   key={index}
@@ -158,32 +158,31 @@ export default function Cart() {
                     </p>
                   </div>
                 </div>
-              ))}              
+              ))}
+              <div className="flex flex-col justify-end p-2 rounded-lg items-center">
+                <div className="text-center pt-6">
+                  <p className="text-xl md:text-2xl lg:text-3xl m-2 md:my-4">
+                    Suma: {totalPrice.toFixed(2)} zł
+                  </p>
+                </div>
+                  
+                <div>
+                  <button
+                    type="submit"
+                    name="action"
+                    value="createOrder"
+                    className="group transition duration-300 ease-in-out mx-2 px-1 lg:px-2 py-1 lg:py-2 text-base sm:text-lg lg:text-xl ring-1 ring-black hover:bg-black hover:text-white text-black bg-white rounded-sm shadow-md"
+                  >
+                    Złóż zamówienie
+                  </button>
+                </div>
+              </div>        
             </div>
           ) : (
             <p className="text-center tracking-widest mt-6">
               {message || "Twój koszyk jest pusty."}
             </p>
           )}
-        </div>
-
-        <div className="flex flex-col justify-end p-2 rounded-lg items-center">
-          <div className="text-center pt-6">
-            <p className="text-xl md:text-2xl lg:text-3xl m-2 md:my-4">
-              Suma: {totalPrice.toFixed(2)} zł
-            </p>
-          </div>
-            
-          <div>
-            <button
-              type="submit"
-              name="action"
-              value="createOrder"
-              className="group transition duration-300 ease-in-out mx-2 px-1 lg:px-2 py-1 lg:py-2 text-base sm:text-lg lg:text-xl ring-1 ring-black hover:bg-black hover:text-white text-black bg-white rounded-sm shadow-md"
-            >
-              Złóż zamówienie
-            </button>
-          </div>
         </div>
       </main>
     </form>

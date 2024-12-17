@@ -1,5 +1,6 @@
 import {
   Links,
+  LiveReload,
   Meta,
   Outlet,
   Scripts,
@@ -36,14 +37,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
         />
         <Meta />
         <Links />
-        <script src="https://geowidget.easypack24.net/js/sdk-for-javascript.js"></script>
+        {/* <script
+          src="https://geowidget.easypack24.net/js/sdk-for-javascript.js"
+          type="text/javascript"
+        ></script> */}
       </head>
       <body>
         <DefaultLayout>
           {children}
           <ScrollRestoration />
           <Scripts />
-        </DefaultLayout>
+          <LiveReload />
+          </DefaultLayout>
       </body>
     </html>
   );

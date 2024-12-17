@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import { getCartData } from "./cart";
@@ -21,6 +21,71 @@ const stripePromise = loadStripe('pk_test_51QWDzLC66ozEbyTE3bWJdZCIgsFId1VpLZ35N
 export default function Checkout() {
 
   let { cart } = useLoaderData();
+  const [parcelLocker, setParcelLocker] = useState<string | null>(null); // Paczkomat
+  const [customerData, setCustomerData] = useState({ email: '', phone: '' });
+
+  const handlePointSelected = (point) => {
+    console.log("Wybrany paczkomat:", point);
+    setParcelLocker(point.name);
+  };
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://geowidget.inpost.pl/inpost-geowidget.js";
+    script.async = true;
+  
+    script.onload = () => {
+      (window as any).InPostGeoWidget.init({
+        target: "geo-widget-container", // Id kontenera na widżet
+        config: {
+          onlyPickupPoints: true, // Wyświetlaj tylko paczkomaty
+          language: "PL",         // Język polski
+          points: {
+            types: ["parcel_locker"], // Filtruj tylko paczkomaty
+          },
+          map: {
+            initialZoom: 12, // Początkowe przybliżenie mapy
+          },
+        },
+        onPoint: (point: any) => {
+          console.log("Wybrany paczkomat:", point.name);
+          setParcelLocker(point.name); // Zapisz wybrany paczkomat w stanie
+        },
+      });
+    };
+  
+    document.body.appendChild(script);
+  
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  const handleInPost = async () => {
+    if (!parcelLocker || !customerData.email || !customerData.phone) {
+      alert('Wypełnij dane oraz wybierz paczkomat!');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/inpost', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ parcelLocker, customerData }),
+      });
+
+      const result = await response.json();
+      if (result.error) {
+        alert('Błąd: ' + result.error);
+        return;
+      }
+
+      alert('Przesyłka utworzona. ID: ' + result.shipmentId);
+    } catch (error) {
+      console.error('Błąd:', error);
+      alert('Wystąpił problem z utworzeniem przesyłki.');
+    }
+  };
 
   const handleCheckout = async () => {
     try {
@@ -35,7 +100,7 @@ export default function Checkout() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({ items, parcelLocker, customerData }),
       });
 
       // Sprawdzenie odpowiedzi HTTP
@@ -49,6 +114,7 @@ export default function Checkout() {
       }
 
       let session;
+
       try {
         // Próba parsowania odpowiedzi jako JSON
         session = await response.json();
@@ -101,7 +167,7 @@ export default function Checkout() {
               >
                 <div className="flex items-center space-x-4">
                   <span className="text-sm md:text-base w-28 sm:w-40 md:w-60 lg:w-80 lg:text-lg p-2 md:px-4 font-normal tracking-widest">
-                    {item.name}
+                    {item.name} ({item.sizeName})
                   </span>
                 </div>
                 <div className="text-right mx-2">
@@ -114,13 +180,42 @@ export default function Checkout() {
               </div>
             ))}
           </div>
-          <div className="flex justify-center">
-            <button
-              className="group transition duration-300 ease-in-out px-2 py-2 mb-2 text-l ring-1 ring-black hover:bg-black hover:text-white text-black bg-white rounded-sm shadow-md"
-              onClick={handleCheckout}
-            >
-              Zapłać
-            </button>
+          <div className="flex flex-col justify-center">
+            <div className="w-full max-w-3xl mb-4">
+              <h2 className="text-xl font-semibold mb-2">Dane klienta</h2>
+              <input
+                type="email"
+                placeholder="Email"
+                className="w-full border rounded p-2 mb-2"
+                value={customerData.email}
+                onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })}
+              />
+              <input
+                type="tel"
+                placeholder="Telefon"
+                className="w-full border rounded p-2"
+                value={customerData.phone}
+                onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value })}
+              />
+              <div className='flex justify-center p-2'>
+                <h1>Wybierz paczkomat</h1>
+                <div id="geo-widget-container" style={{ height: "500px", width: "100%" }}></div>
+              </div>
+            </div>
+            <div className="flex justify-center space-x-4">
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={handleInPost}
+              >
+                Utwórz przesyłkę
+              </button>
+              <button
+                className="group transition duration-300 ease-in-out px-2 py-2 mb-2 text-l ring-1 ring-black hover:bg-black hover:text-white text-black bg-white rounded-sm shadow-md"
+                onClick={handleCheckout}
+              >
+                Zapłać
+              </button>
+            </div>
           </div>
         </div>
       </div>

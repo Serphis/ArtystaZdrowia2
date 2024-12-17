@@ -45,13 +45,26 @@ model Size {
 }
 
 model Order {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  email       String
-  products    OrderItem[]
-  totalPrice  Float
-  status      String   @default("Oczekujące")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
+  id              String       @id @default(auto()) @map("_id") @db.ObjectId
+  email           String
+  receiverName    String
+  receiverPhone   String
+  deliveryMethod  String       @default("Paczkomat") // 'Paczkomat' lub 'Kurier'
+  paymentMethod   String       @default("online")    // 'online' lub 'cod' (za pobraniem)
+  shippingStatus  String       @default("Nie wysłano")
+  trackingNumber  String?
+  status          String       @default("Oczekujące")
+  totalPrice      Float
+
+  address         Json?
+  
+  parcelLocker    String?
+  zipCode         String?
+
+  products        OrderItem[]
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @default(now()) @updatedAt
 }
 
 model OrderItem {
