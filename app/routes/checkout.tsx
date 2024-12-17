@@ -6,7 +6,7 @@ import { getSession, commitSession } from "../utils/session.server";
 import { json, LoaderFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import { InpostGeowidgetReact } from 'inpost-geowidget-react'
-import { db } from '../services/index';
+import { db } from '~/services/index';
 
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -78,7 +78,6 @@ export default function Checkout() {
   const handleCheckout = async () => {
 
     try {
-
       const items = Object.values(cart).map(item => ({
         id: `${item.name} - ${item.sizeName}`,
         quantity: parseInt(item.stock, 10),
