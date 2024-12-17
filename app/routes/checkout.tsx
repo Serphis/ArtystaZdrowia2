@@ -31,7 +31,7 @@ export default function Checkout() {
     setParcelLocker(point.name);
   };
 
-  const token = `${import.meta.env.INPOST_KEY}`;     // Generate YOUR_TOKEN on https://manager.paczkomaty.pl (for production environment) or https://sandbox-manager.paczkomaty.pl (for sandbox environment).
+  const token = `eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzQlpXVzFNZzVlQnpDYU1XU3JvTlBjRWFveFpXcW9Ua2FuZVB3X291LWxvIn0.eyJleHAiOjIwNDk3OTczNjcsImlhdCI6MTczNDQzNzM2NywianRpIjoiZGUzMzZmYWUtZGE2OS00OGI0LWE0ZGYtZDc0ZGYwNzc2MWE0IiwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5pbnBvc3QucGwvYXV0aC9yZWFsbXMvZXh0ZXJuYWwiLCJzdWIiOiJmOjEyNDc1MDUxLTFjMDMtNGU1OS1iYTBjLTJiNDU2OTVlZjUzNTpjQ2xYcXA2c0J1Snl4MmVUUHlGMWlpeGVOSmRPRmFTRmhkSUM5ZG8zTHBJIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoic2hpcHgiLCJzZXNzaW9uX3N0YXRlIjoiZGE5Y2NlMDQtMjNkZi00Mjc1LTg0MzgtNjAwZTAzODU2YzkyIiwic2NvcGUiOiJvcGVuaWQgYXBpOmFwaXBvaW50cyIsInNpZCI6ImRhOWNjZTA0LTIzZGYtNDI3NS04NDM4LTYwMGUwMzg1NmM5MiIsImFsbG93ZWRfcmVmZXJyZXJzIjoid3d3LmFydHlzdGF6ZHJvd2lhLmNvbSIsInV1aWQiOiJiYmE0MmU0MC05YzRlLTRiOGQtYTMzYS1hNzEwZTdkZTllZWEifQ.gOiFNNqvOsQ8zros4NcAP3PTfiYvpTuHzfc6aiF2cSW-mEhMf5zfXgFQSUBsSqDcenSQR_FTQ700MOQmjxQFH3rRVYT_TWDNARpfp4-p-jwIFPzH_D1VT-2j0aJw7Sm7QE93GtXMnqdptjaYQrzQfPpZzekr6lVUO1vSux6moDavIfvzbLRXBp4kdL8PPD1fHh9u5sLUiKEnK-Mtj7iTStZceZ_YhnxM2_nS53tfwHNA2gmWQ87F169GUgSXlSMpvSczd_DPb5txlPl-F34KyjXbttkF7wvnKva5LGmH5KRKTNPWJQ2imOtg3ZK-gdyLstWJlSzf0CGiaS-rbyb0zw`;     // Generate YOUR_TOKEN on https://manager.paczkomaty.pl (for production environment) or https://sandbox-manager.paczkomaty.pl (for sandbox environment).
   const identifier = 'Geo1';      // Html element identifier, default: 'Geo1'
   const language = 'pl';          // Language, default: 'pl'
   const config = 'parcelcollect'; // Config, default: 'parcelcollect'
