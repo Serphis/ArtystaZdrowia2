@@ -1,46 +1,64 @@
-import { json, redirect } from '@remix-run/node'; // Importujemy potrzebne funkcje z Remix
+import { json, redirect } from '@remix-run/node';
 import Stripe from 'stripe';
+import { db } from '../services/index';
 
-// Inicjalizuj Stripe z Twoim kluczem sekretnym
 const stripe = new Stripe(`${process.env.SEKRETNY_KLUCZ_STRIPE}`, {
   apiVersion: '2024-11-20.acacia',
 });
 
-// Funkcja `action` obsługująca zapytanie POST
 export const action = async ({ request }: { request: Request }) => {
   if (request.method === 'POST') {
     try {
-      const { items } = await request.json(); // Odbieramy dane z ciała zapytania (items)
+      const { items, address, receiverName, receiverPhone, deliveryMethod, paymentMethod, totalPrice, zipCode, parcelLocker } = await request.json();
   
-      // Tworzymy linie zamówienia
       const lineItems = items.map((item: { id: string; quantity: number; price: number }) => ({
         price_data: {
           currency: 'pln',
           product_data: {
-            name: item.id, // Nazwa produktu np. "Świeczka zapachowa"
+            name: item.id,
           },
-          unit_amount: item.price, // Cena w groszach (np. 49.99 zł)
+          unit_amount: item.price,
         },
         quantity: item.quantity,
       }));
 
-      // Tworzymy sesję Stripe Checkout
       const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card', 'blik'], // Obsługiwane metody płatności
+        payment_method_types: ['card', 'blik'],
         line_items: lineItems,
         mode: 'payment',
-        success_url: `${new URL('https://www.artystazdrowia.com//success', request.url)}`, // URL po udanej płatności
-        cancel_url: `${new URL('https://www.artystazdrowia.com//cancel', request.url)}`, // URL po anulowaniu płatności
+        success_url: `${new URL('https://www.artystazdrowia.com//success', request.url)}`,
+        cancel_url: `${new URL('https://www.artystazdrowia.com//cancel', request.url)}`,
       });
 
-      // Zwracamy ID sesji Stripe
+      const order = await db.order.create({
+        data: {
+          email: '',
+          receiverName,
+          receiverPhone,
+          deliveryMethod,
+          paymentMethod,
+          totalPrice,
+          address,
+          zipCode,
+          parcelLocker,
+          products: {
+            create: items.map(item => ({
+              productId: item.id,
+              sizeId: item.sizeId,
+              sizePrice: item.price,
+              sizeStock: item.stock,
+              quantity: item.quantity,
+            })),
+          },
+        },
+      });
+
       return json({ id: session.id });
     } catch (err: any) {
       console.error(err);
       return json({ error: err.message }, { status: 500 });
     }
   }
-  // Jeśli metoda nie jest POST, zwróć 405
   return new Response('Method Not Allowed', { status: 405 });
 };
 
