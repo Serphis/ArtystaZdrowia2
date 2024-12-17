@@ -10,7 +10,6 @@ export const action = async ({ req }: { req: Request }) => {
   if (req.method === 'POST') {
     try {
       const { 
-        items,
         customerData,
         deliveryMethod,
         paymentMethod,
@@ -28,7 +27,7 @@ export const action = async ({ req }: { req: Request }) => {
           sizeId: item.sizeId,
         }));
 
-        const lineItems = items.map((item: { id: string; quantity: number; price: number }) => ({
+        const lineItems = cartItems.map((item: any ) => ({
           price_data: {
             currency: 'pln',
             product_data: {

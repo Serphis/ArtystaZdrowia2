@@ -84,13 +84,31 @@ export default function Checkout() {
         price: parseInt(item.sizePrice)*100,
       }));
 
+      const orderData = {
+        customer: {
+          email: customerData.email,
+          name: customerData.name,
+          phone: customerData.phone,
+        },
+        delivery: {
+          method: deliveryMethod,
+          parcelLocker: parcelLocker, // Ensure the parcel locker is included
+          address: address, // Include address details
+        },
+        payment: {
+          method: paymentMethod,
+          totalPrice: totalPrice, // Ensure total price is passed correctly
+        },
+        items: items,
+      };
+
       const response = await fetch('https://www.artystazdrowia.com/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          items
+          orderData
         }),
       });
 
