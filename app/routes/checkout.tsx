@@ -5,6 +5,8 @@ import { getCartData } from "./cart";
 import { getSession, commitSession } from "../utils/session.server";
 import { json, LoaderFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
+import { InpostGeowidgetReact } from 'inpost-geowidget-react'
+
 
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
@@ -29,63 +31,21 @@ export default function Checkout() {
     setParcelLocker(point.name);
   };
 
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://geowidget.inpost.pl/inpost-geowidget.js";
-    script.async = true;
-  
-    script.onload = () => {
-      (window as any).InPostGeoWidget.init({
-        target: "geo-widget-container", // Id kontenera na widżet
-        config: {
-          onlyPickupPoints: true, // Wyświetlaj tylko paczkomaty
-          language: "PL",         // Język polski
-          points: {
-            types: ["parcel_locker"], // Filtruj tylko paczkomaty
-          },
-          map: {
-            initialZoom: 12, // Początkowe przybliżenie mapy
-          },
-        },
-        onPoint: (point: any) => {
-          console.log("Wybrany paczkomat:", point.name);
-          setParcelLocker(point.name); // Zapisz wybrany paczkomat w stanie
-        },
-      });
-    };
-  
-    document.body.appendChild(script);
-  
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+  const token = `${import.meta.env.INPOST_KEY}`;     // Generate YOUR_TOKEN on https://manager.paczkomaty.pl (for production environment) or https://sandbox-manager.paczkomaty.pl (for sandbox environment).
+  const identifier = 'Geo1';      // Html element identifier, default: 'Geo1'
+  const language = 'pl';          // Language, default: 'pl'
+  const config = 'parcelcollect'; // Config, default: 'parcelcollect'
+  const sandbox = true;          // Run as sandbox environment, default: false
 
-  const handleInPost = async () => {
-    if (!parcelLocker || !customerData.email || !customerData.phone) {
-      alert('Wypełnij dane oraz wybierz paczkomat!');
-      return;
-    }
+  const apiReady = (api: any) => {
+    // You can also use API Methods, as example
+    // api.changePosition({ longitude: 20.318968, latitude: 49.731131 }, 16);
+    console.log(api);
+  }
 
-    try {
-      const response = await fetch('/api/inpost', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ parcelLocker, customerData }),
-      });
-
-      const result = await response.json();
-      if (result.error) {
-        alert('Błąd: ' + result.error);
-        return;
-      }
-
-      alert('Przesyłka utworzona. ID: ' + result.shipmentId);
-    } catch (error) {
-      console.error('Błąd:', error);
-      alert('Wystąpił problem z utworzeniem przesyłki.');
-    }
-  };
+  const pointSelect = (point: any) => {
+    console.log('Object of selected point: ', point);
+  }
 
   const handleCheckout = async () => {
     try {
@@ -197,18 +157,14 @@ export default function Checkout() {
                 value={customerData.phone}
                 onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value })}
               />
-              <div className='flex justify-center p-2'>
+              <div className='flex justify-center text-center p-2'>
                 <h1>Wybierz paczkomat</h1>
-                <div id="geo-widget-container" style={{ height: "500px", width: "100%" }}></div>
+                <div style={{ height: '500px', width: '500px' }}>
+                  <InpostGeowidgetReact token={ token } identifier={ identifier } apiReady={ apiReady } pointSelect={ pointSelect } />
+                </div>
               </div>
             </div>
-            <div className="flex justify-center space-x-4">
-              <button
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={handleInPost}
-              >
-                Utwórz przesyłkę
-              </button>
+            <div className="flex justify-center">
               <button
                 className="group transition duration-300 ease-in-out px-2 py-2 mb-2 text-l ring-1 ring-black hover:bg-black hover:text-white text-black bg-white rounded-sm shadow-md"
                 onClick={handleCheckout}
