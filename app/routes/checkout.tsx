@@ -78,12 +78,19 @@ export default function Checkout() {
   const handleCheckout = async () => {
 
     try {
+      const items = Object.values(cart).map(item => ({
+        id: `${item.name}-${item.sizeName}`,
+        quantity: parseInt(item.stock, 10),
+        price: item.sizePrice
+      }));
+
       const response = await fetch('https://www.artystazdrowia.com/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          items,
           customerData,
           deliveryMethod,
           paymentMethod,
