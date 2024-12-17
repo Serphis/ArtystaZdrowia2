@@ -10,6 +10,7 @@ export const action = async ({ req }) => {
   if (req.method === 'POST') {
     try {
       const { 
+        items,
         customerData,
         deliveryMethod,
         paymentMethod,
@@ -22,7 +23,7 @@ export const action = async ({ req }) => {
       
       if (stripeCheckout) {
 
-        const items = Object.values(cart).map((item: any) => ({
+        const itemsCart = Object.values(cart).map((item: any) => ({
           id: `${item.name} - ${item.sizeName}`,
           quantity: parseInt(item.stock, 10),
           price: parseInt(item.sizePrice) * 100,
@@ -60,7 +61,7 @@ export const action = async ({ req }) => {
             address,
             parcelLocker,
             products: {
-              create: items.map(item => ({
+              create: itemsCart.map(item => ({
                 product: { connect: { id: item.id } },
                 size: { connect: { id: item.sizeId } },
                 sizeName: item.sizeName,
