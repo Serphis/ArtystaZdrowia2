@@ -6,7 +6,7 @@ const stripe = new Stripe(`${process.env.SEKRETNY_KLUCZ_STRIPE}`, {
   apiVersion: '2024-11-20.acacia',
 });
 
-export default async function handler( req: Request, res: Response ) {
+export const action = async ({ req }) => {
   if (req.method === 'POST') {
     try {
       const { 
@@ -72,16 +72,13 @@ export default async function handler( req: Request, res: Response ) {
         });
 
 
-        return res.status(200).json({ sessionId: session.id, order });
+        return json({ sessionId: session.id, order });
       }
     } catch (error: any) {
       console.error('Error processing checkout:', error);
-      return res.status(500).json({ message: 'Checkout failed', error: error.message });
+      return json({ message: 'Checkout failed', error: error.message }, { status: 500 });
     }
-  }
-
-  return res.status(405).json({ message: 'Method Not Allowed' });
-}
+};
 
 
 // // Opcjonalnie, jeśli chcesz obsługiwać stronę sukcesu lub anulowania, możesz dodać loadera
