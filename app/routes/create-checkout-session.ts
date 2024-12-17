@@ -6,7 +6,7 @@ const stripe = new Stripe(`${process.env.SEKRETNY_KLUCZ_STRIPE}`, {
   apiVersion: '2024-11-20.acacia',
 });
 
-export const action = async ({ req }) => {
+export const action = async ({ req }: { req: Request }) => {
   if (req.method === 'POST') {
     try {
       const { 
@@ -18,12 +18,9 @@ export const action = async ({ req }) => {
         address,
         parcelLocker,
         cart,
-        stripeCheckout,
       } = await req.json();
-      
-      if (stripeCheckout) {
 
-        const itemsCart = Object.values(cart).map((item: any) => ({
+        const cartItems = Object.values(cart).map((item: any) => ({
           id: `${item.name} - ${item.sizeName}`,
           quantity: parseInt(item.stock, 10),
           price: parseInt(item.sizePrice) * 100,
@@ -61,7 +58,7 @@ export const action = async ({ req }) => {
             address,
             parcelLocker,
             products: {
-              create: itemsCart.map(item => ({
+              create: cartItems.map(item => ({
                 product: { connect: { id: item.id } },
                 size: { connect: { id: item.sizeId } },
                 sizeName: item.sizeName,
@@ -73,9 +70,9 @@ export const action = async ({ req }) => {
         });
 
 
-        return json({ sessionId: session.id, order });
+        return json({ sessionId: session.id });
       }
-    } catch (error: any) {
+      catch (error: any) {
       console.error('Error processing checkout:', error);
       return json({ message: 'Checkout failed', error: error.message }, { status: 500 });
     }
