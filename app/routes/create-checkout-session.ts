@@ -78,8 +78,8 @@ export const action = async ({ req }) => {
       console.error('Error processing checkout:', error);
       return json({ message: 'Checkout failed', error: error.message }, { status: 500 });
     }
-};
-
+  }
+}
 
 // // Opcjonalnie, jeśli chcesz obsługiwać stronę sukcesu lub anulowania, możesz dodać loadera
 // export const loader = async () => {
