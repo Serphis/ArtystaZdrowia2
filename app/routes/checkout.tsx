@@ -78,92 +78,65 @@ export default function Checkout() {
   const handleCheckout = async () => {
 
     try {
-      const items = Object.values(cart).map(item => ({
-        id: `${item.name} - ${item.sizeName}`,
-        quantity: parseInt(item.stock, 10),
-        price: parseInt(item.sizePrice)*100,
-        sizeName: item.sizeName,
-        sizeId: item.sizeId,
-      }));
-
-      const order = await db.order.create({
-        data: {
-          email: customerData.email,
-          receiverName: customerData.name,
-          receiverPhone: customerData.phone,
+      const response = await fetch('https://www.artystazdrowia.com/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerData,
           deliveryMethod,
           paymentMethod,
           totalPrice,
           address,
           parcelLocker,
-          products: {
-            create: items.map(item => ({
-              product: { connect: { id: item.id } },
-              size: { connect: { id: item.sizeId } },
-              sizeName: item.sizeName,
-              sizePrice: item.price,
-              quantity: item.quantity,
-            })),
-          },
-        },
+          cart,
+        }),
       });
 
-      alert('Order created successfully:' + order);
+      if (!response.ok) {
+        console.error('Błąd HTTP:', response.status, response.statusText);
+        const responseClone = response.clone();
+        const errorText = await responseClone.text();
+        console.error('Treść odpowiedzi (HTML):', errorText);
+        alert('Błąd podczas tworzenia sesji płatności. Skontaktuj się z obsługą.');
+        return;
+      }
+
+      let session;
+
+      try {
+        session = await response.json();
+      } catch (jsonError) {
+        const responseClone = response.clone();
+        const errorText = await responseClone.text();
+        console.error('Błąd parsowania JSON:', jsonError);
+        console.error('Treść odpowiedzi (HTML):', errorText);
+        alert('Błąd podczas przetwarzania danych płatności. Skontaktuj się z obsługą.');
+        return;
+      }
+
+      if (session.error) {
+        console.error(session.error);
+        alert('Błąd podczas tworzenia sesji płatności: ' + session.error.message);
+        return;
+      }
+
+      const stripe = await stripePromise;
+      if (!stripe) {
+        alert('Stripe nie został poprawnie załadowany.');
+        return;
+      }
+      const { error } = await stripe!.redirectToCheckout({ sessionId: session.id });
+
+      if (error) {
+        console.error(error.message);
+        alert('Wystąpił błąd podczas przekierowania do płatności.');
+      }
     } catch (error) {
-      console.error('Error creating order:', error);
+      console.error('Błąd podczas obsługi płatności:', error);
+      alert('Wystąpił błąd podczas obsługi płatności. Spróbuj ponownie później.');
     }
-
-    //   const response = await fetch('https://www.artystazdrowia.com/create-checkout-session', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({ items, customerData }),
-    //   });
-
-    //   if (!response.ok) {
-    //     console.error('Błąd HTTP:', response.status, response.statusText);
-    //     const responseClone = response.clone();
-    //     const errorText = await responseClone.text();
-    //     console.error('Treść odpowiedzi (HTML):', errorText);
-    //     alert('Błąd podczas tworzenia sesji płatności. Skontaktuj się z obsługą.');
-    //     return;
-    //   }
-
-    //   let session;
-
-    //   try {
-    //     session = await response.json();
-    //   } catch (jsonError) {
-    //     const responseClone = response.clone();
-    //     const errorText = await responseClone.text();
-    //     console.error('Błąd parsowania JSON:', jsonError);
-    //     console.error('Treść odpowiedzi (HTML):', errorText);
-    //     alert('Błąd podczas przetwarzania danych płatności. Skontaktuj się z obsługą.');
-    //     return;
-    //   }
-
-    //   if (session.error) {
-    //     console.error(session.error);
-    //     alert('Błąd podczas tworzenia sesji płatności: ' + session.error.message);
-    //     return;
-    //   }
-
-    //   const stripe = await stripePromise;
-    //   if (!stripe) {
-    //     alert('Stripe nie został poprawnie załadowany.');
-    //     return;
-    //   }
-    //   const { error } = await stripe!.redirectToCheckout({ sessionId: session.id });
-
-    //   if (error) {
-    //     console.error(error.message);
-    //     alert('Wystąpił błąd podczas przekierowania do płatności.');
-    //   }
-    // } catch (error) {
-    //   console.error('Błąd podczas obsługi płatności:', error);
-    //   alert('Wystąpił błąd podczas obsługi płatności. Spróbuj ponownie później.');
-    // }
   };
 
   return (

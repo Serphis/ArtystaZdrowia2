@@ -1,43 +1,88 @@
-import { json, redirect } from '@remix-run/node';
+import { json, Request, Response } from '@remix-run/node';
 import Stripe from 'stripe';
+import { db } from '../services/index';
 
 const stripe = new Stripe(`${process.env.SEKRETNY_KLUCZ_STRIPE}`, {
   apiVersion: '2024-11-20.acacia',
 });
 
-export const action = async ({ request }: { request: Request }) => {
-  if (request.method === 'POST') {
+export default async function handler( req: Request, res: Response ) {
+  if (req.method === 'POST') {
     try {
-      const { items, parcelLocker } = await request.json();
-        
-      const lineItems = items.map((item: { id: string; quantity: number; price: number }) => ({
-        price_data: {
-          currency: 'pln',
-          product_data: {
-            name: item.id,
+      const { items, 
+        customerData,
+        deliveryMethod,
+        paymentMethod,
+        totalPrice,
+        address,
+        parcelLocker,
+        cart,
+        stripeCheckout,
+      } = await req.json();
+      
+      if (stripeCheckout) {
+
+        const items = Object.values(cart).map((item: any) => ({
+          id: `${item.name} - ${item.sizeName}`,
+          quantity: parseInt(item.stock, 10),
+          price: parseInt(item.sizePrice) * 100,
+          sizeName: item.sizeName,
+          sizeId: item.sizeId,
+        }));
+
+        const lineItems = items.map((item: { id: string; quantity: number; price: number }) => ({
+          price_data: {
+            currency: 'pln',
+            product_data: {
+              name: item.id,
+            },
+            unit_amount: item.price,
           },
-          unit_amount: item.price,
-        },
-        quantity: item.quantity,
-      }));
+          quantity: item.quantity,
+        }));
 
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card', 'blik'],
-        line_items: lineItems,
-        mode: 'payment',
-        success_url: `${new URL('https://www.artystazdrowia.com//success', request.url)}`,
-        cancel_url: `${new URL('https://www.artystazdrowia.com//cancel', request.url)}`,
-      });
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ['card', 'blik'],
+          line_items: lineItems,
+          mode: 'payment',
+          success_url: `${new URL('https://www.artystazdrowia.com/success', request.url)}`,
+          cancel_url: `${new URL('https://www.artystazdrowia.com/cancel', request.url)}`,
+        });
+
+        const order = await db.order.create({
+          data: {
+            email: customerData.email,
+            receiverName: customerData.name,
+            receiverPhone: customerData.phone,
+            deliveryMethod,
+            paymentMethod,
+            totalPrice,
+            address,
+            parcelLocker,
+            products: {
+              create: items.map(item => ({
+                product: { connect: { id: item.id } },
+                size: { connect: { id: item.sizeId } },
+                sizeName: item.sizeName,
+                sizePrice: item.price,
+                quantity: item.quantity,
+              })),
+            },
+          },
+        });
 
 
-      return json({ id: session.id });
-    } catch (err: any) {
-      console.error(err);
-      return json({ error: err.message }, { status: 500 });
+        return res.status(200).json({ sessionId: session.id, order });
+      }
+    } catch (error: any) {
+      console.error('Error processing checkout:', error);
+      return res.status(500).json({ message: 'Checkout failed', error: error.message });
     }
   }
-  return new Response('Method Not Allowed', { status: 405 });
-};
+
+  return res.status(405).json({ message: 'Method Not Allowed' });
+}
+
 
 // // Opcjonalnie, jeśli chcesz obsługiwać stronę sukcesu lub anulowania, możesz dodać loadera
 // export const loader = async () => {
