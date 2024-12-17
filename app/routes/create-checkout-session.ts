@@ -19,6 +19,14 @@ export const action = async ({ req }: { req: Request }) => {
         cart,
       } = await req.json();
 
+        alert(customerData)
+        alert(deliveryMethod)
+        alert(paymentMethod)
+        alert(totalPrice)
+        alert(address)
+        alert(parcelLocker)
+        alert(cart)
+
         const cartItems = Object.values(cart).map((item: any) => ({
           id: `${item.name} - ${item.sizeName}`,
           quantity: parseInt(item.stock, 10),
