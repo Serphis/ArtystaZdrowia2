@@ -1,6 +1,5 @@
 import { json, redirect } from '@remix-run/node';
 import Stripe from 'stripe';
-import { db } from '../services/index';
 
 const stripe = new Stripe(`${process.env.SEKRETNY_KLUCZ_STRIPE}`, {
   apiVersion: '2024-11-20.acacia',
@@ -9,10 +8,8 @@ const stripe = new Stripe(`${process.env.SEKRETNY_KLUCZ_STRIPE}`, {
 export const action = async ({ request }: { request: Request }) => {
   if (request.method === 'POST') {
     try {
-      const { items, orderData, parcelLocker } = await request.json();
-  
-      console.log("AAAAAAAAAAAAAa", orderData)
-      
+      const { items, parcelLocker } = await request.json();
+        
       const lineItems = items.map((item: { id: string; quantity: number; price: number }) => ({
         price_data: {
           currency: 'pln',
@@ -32,28 +29,6 @@ export const action = async ({ request }: { request: Request }) => {
         cancel_url: `${new URL('https://www.artystazdrowia.com//cancel', request.url)}`,
       });
 
-      const order = await db.order.create({
-        data: {
-          email: '',
-          receiverName,
-          receiverPhone,
-          deliveryMethod,
-          paymentMethod,
-          totalPrice,
-          address,
-          zipCode,
-          parcelLocker,
-          products: {
-            create: items.map(item => ({
-              productId: item.id,
-              sizeId: item.sizeId,
-              sizePrice: item.price,
-              sizeStock: item.stock,
-              quantity: item.quantity,
-            })),
-          },
-        },
-      });
 
       return json({ id: session.id });
     } catch (err: any) {

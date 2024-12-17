@@ -78,7 +78,7 @@ model OrderItem {
   sizeId    String   @db.ObjectId
   size      Size     @relation(fields: [sizeId], references: [id])
 
+  sizeName  String
   sizePrice Float
-  sizeStock Int
   quantity  Int      @default(1)
 }

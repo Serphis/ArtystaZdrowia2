@@ -6,6 +6,7 @@ import { getSession, commitSession } from "../utils/session.server";
 import { json, LoaderFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import { InpostGeowidgetReact } from 'inpost-geowidget-react'
+import { db } from '../services/index';
 
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -20,14 +21,13 @@ const stripePromise = loadStripe('pk_test_51QWDzLC66ozEbyTE3bWJdZCIgsFId1VpLZ35N
 
 export default function Checkout() {
 
-  let { cart } = useLoaderData();
-  const [deliveryMethod, setDeliveryMethod] = useState('Kurier');
+  let { cart, totalPrice } = useLoaderData();
+  const [deliveryMethod, setDeliveryMethod] = useState('Kurier InPost');
   const [paymentMethod, setPaymentMethod] = useState('online');
   const [parcelLocker, setParcelLocker] = useState<string | null>(null);
-  const [customerData, setCustomerData] = useState({ email: '', phone: '' });
+  const [customerData, setCustomerData] = useState({ name: '', email: '', phone: '' });
   const [address, setAddress] = useState({ street: '', city: '', zip: '' });
   const [selectedPoint, setSelectedPoint] = useState<any>(null);
-  const [isHovered, setIsHovered] = useState(false);
 
   const token = `eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzQlpXVzFNZzVlQnpDYU1XU3JvTlBjRWFveFpXcW9Ua2FuZVB3X291LWxvIn0.eyJleHAiOjIwNDk3OTczNjcsImlhdCI6MTczNDQzNzM2NywianRpIjoiZGUzMzZmYWUtZGE2OS00OGI0LWE0ZGYtZDc0ZGYwNzc2MWE0IiwiaXNzIjoiaHR0cHM6Ly9sb2dpbi5pbnBvc3QucGwvYXV0aC9yZWFsbXMvZXh0ZXJuYWwiLCJzdWIiOiJmOjEyNDc1MDUxLTFjMDMtNGU1OS1iYTBjLTJiNDU2OTVlZjUzNTpjQ2xYcXA2c0J1Snl4MmVUUHlGMWlpeGVOSmRPRmFTRmhkSUM5ZG8zTHBJIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoic2hpcHgiLCJzZXNzaW9uX3N0YXRlIjoiZGE5Y2NlMDQtMjNkZi00Mjc1LTg0MzgtNjAwZTAzODU2YzkyIiwic2NvcGUiOiJvcGVuaWQgYXBpOmFwaXBvaW50cyIsInNpZCI6ImRhOWNjZTA0LTIzZGYtNDI3NS04NDM4LTYwMGUwMzg1NmM5MiIsImFsbG93ZWRfcmVmZXJyZXJzIjoid3d3LmFydHlzdGF6ZHJvd2lhLmNvbSIsInV1aWQiOiJiYmE0MmU0MC05YzRlLTRiOGQtYTMzYS1hNzEwZTdkZTllZWEifQ.gOiFNNqvOsQ8zros4NcAP3PTfiYvpTuHzfc6aiF2cSW-mEhMf5zfXgFQSUBsSqDcenSQR_FTQ700MOQmjxQFH3rRVYT_TWDNARpfp4-p-jwIFPzH_D1VT-2j0aJw7Sm7QE93GtXMnqdptjaYQrzQfPpZzekr6lVUO1vSux6moDavIfvzbLRXBp4kdL8PPD1fHh9u5sLUiKEnK-Mtj7iTStZceZ_YhnxM2_nS53tfwHNA2gmWQ87F169GUgSXlSMpvSczd_DPb5txlPl-F34KyjXbttkF7wvnKva5LGmH5KRKTNPWJQ2imOtg3ZK-gdyLstWJlSzf0CGiaS-rbyb0zw`;     // Generate YOUR_TOKEN on https://manager.paczkomaty.pl (for production environment) or https://sandbox-manager.paczkomaty.pl (for sandbox environment).
   const identifier = 'Geo1';      // Html element identifier, default: 'Geo1'
@@ -51,83 +51,120 @@ export default function Checkout() {
     setSelectedPoint(point);
   };
 
-  const handleMouseEnter = () => setIsHovered(true);
-  const handleMouseLeave = () => setIsHovered(false);
+  totalPrice *= 100;
+
+  // const orderData = {
+      //   customer: {
+      //     email: customerData.email,
+      //     name: customerData.name,
+      //     phone: customerData.phone,
+      //   },
+      //   delivery: {
+      //     method: deliveryMethod,
+      //     parcelLocker: parcelLocker,
+      //     address: {
+      //       city: address.city,
+      //       street: address.street,
+      //       zip: address.zip,
+      //     },
+      //   },
+      //   payment: {
+      //     method: paymentMethod,
+      //     totalPrice: totalPrice,
+      //   },
+      //   items: items,
+      // };
 
   const handleCheckout = async () => {
+
     try {
+
       const items = Object.values(cart).map(item => ({
         id: `${item.name} - ${item.sizeName}`,
         quantity: parseInt(item.stock, 10),
         price: parseInt(item.sizePrice)*100,
+        sizeName: item.sizeName,
+        sizeId: item.sizeId,
       }));
 
-      const orderData = {
-        email: customerData.email,
-        receiverPhone: customerData.phone,
-        deliveryMethod,
-        paymentMethod,
-        parcelLocker: parcelLocker ?? '',
-        address: deliveryMethod === 'Kurier' || deliveryMethod === 'Kurier za pobraniem' ? address : null,
-        totalPrice: cart.totalPrice,
-        products: items,
-      };
-
-      const response = await fetch('https://www.artystazdrowia.com/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const order = await db.order.create({
+        data: {
+          email: customerData.email,
+          receiverName: customerData.name,
+          receiverPhone: customerData.phone,
+          deliveryMethod,
+          paymentMethod,
+          totalPrice,
+          address,
+          parcelLocker,
+          products: {
+            create: items.map(item => ({
+              product: { connect: { id: item.id } },
+              size: { connect: { id: item.sizeId } },
+              sizeName: item.sizeName,
+              sizePrice: item.price,
+              quantity: item.quantity,
+            })),
+          },
         },
-        body: JSON.stringify({ items, orderData, customerData }),
       });
 
-      // Sprawdzenie odpowiedzi HTTP
-      if (!response.ok) {
-        console.error('Błąd HTTP:', response.status, response.statusText);
-        const responseClone = response.clone();
-        const errorText = await responseClone.text();
-        console.error('Treść odpowiedzi (HTML):', errorText);
-        alert('Błąd podczas tworzenia sesji płatności. Skontaktuj się z obsługą.');
-        return;
-      }
-
-      let session;
-
-      try {
-        // Próba parsowania odpowiedzi jako JSON
-        session = await response.json();
-      } catch (jsonError) {
-        const responseClone = response.clone();
-        const errorText = await responseClone.text();
-        console.error('Błąd parsowania JSON:', jsonError);
-        console.error('Treść odpowiedzi (HTML):', errorText);
-        alert('Błąd podczas przetwarzania danych płatności. Skontaktuj się z obsługą.');
-        return;
-      }
-
-      // Sprawdzenie, czy sesja zawiera błąd
-      if (session.error) {
-        console.error(session.error);
-        alert('Błąd podczas tworzenia sesji płatności: ' + session.error.message);
-        return;
-      }
-
-      // Pobranie Stripe i przekierowanie do płatności
-      const stripe = await stripePromise;
-      if (!stripe) {
-        alert('Stripe nie został poprawnie załadowany.');
-        return;
-      }
-      const { error } = await stripe!.redirectToCheckout({ sessionId: session.id });
-
-      if (error) {
-        console.error(error.message);
-        alert('Wystąpił błąd podczas przekierowania do płatności.');
-      }
+      alert('Order created successfully:' + order);
     } catch (error) {
-      console.error('Błąd podczas obsługi płatności:', error);
-      alert('Wystąpił błąd podczas obsługi płatności. Spróbuj ponownie później.');
+      console.error('Error creating order:', error);
     }
+
+    //   const response = await fetch('https://www.artystazdrowia.com/create-checkout-session', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({ items, customerData }),
+    //   });
+
+    //   if (!response.ok) {
+    //     console.error('Błąd HTTP:', response.status, response.statusText);
+    //     const responseClone = response.clone();
+    //     const errorText = await responseClone.text();
+    //     console.error('Treść odpowiedzi (HTML):', errorText);
+    //     alert('Błąd podczas tworzenia sesji płatności. Skontaktuj się z obsługą.');
+    //     return;
+    //   }
+
+    //   let session;
+
+    //   try {
+    //     session = await response.json();
+    //   } catch (jsonError) {
+    //     const responseClone = response.clone();
+    //     const errorText = await responseClone.text();
+    //     console.error('Błąd parsowania JSON:', jsonError);
+    //     console.error('Treść odpowiedzi (HTML):', errorText);
+    //     alert('Błąd podczas przetwarzania danych płatności. Skontaktuj się z obsługą.');
+    //     return;
+    //   }
+
+    //   if (session.error) {
+    //     console.error(session.error);
+    //     alert('Błąd podczas tworzenia sesji płatności: ' + session.error.message);
+    //     return;
+    //   }
+
+    //   const stripe = await stripePromise;
+    //   if (!stripe) {
+    //     alert('Stripe nie został poprawnie załadowany.');
+    //     return;
+    //   }
+    //   const { error } = await stripe!.redirectToCheckout({ sessionId: session.id });
+
+    //   if (error) {
+    //     console.error(error.message);
+    //     alert('Wystąpił błąd podczas przekierowania do płatności.');
+    //   }
+    // } catch (error) {
+    //   console.error('Błąd podczas obsługi płatności:', error);
+    //   alert('Wystąpił błąd podczas obsługi płatności. Spróbuj ponownie później.');
+    // }
   };
 
   return (
@@ -183,11 +220,21 @@ export default function Checkout() {
                   <input
                     type="radio"
                     name="deliveryMethod"
-                    value="Kurier"
-                    checked={deliveryMethod === 'Kurier'}
-                    onChange={() => setDeliveryMethod('Kurier')}
+                    value="Kurier DPD"
+                    checked={deliveryMethod === 'Kurier DPD'}
+                    onChange={() => setDeliveryMethod('Kurier DPD')}
                   />
-                  Kurier
+                  Kurier DPD
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="deliveryMethod"
+                    value="Kurier InPost"
+                    checked={deliveryMethod === 'Kurier InPost'}
+                    onChange={() => setDeliveryMethod('Kurier InPost')}
+                  />
+                  Kurier InPost
                 </label>
                 {deliveryMethod === 'Paczkomat' && (
                   <div style={{ height: '500px' }} className='py-2'>
@@ -201,7 +248,7 @@ export default function Checkout() {
                 )}
                 {/* Możliwość wyboru innych metod */}
 
-                {['Kurier', 'Kurier za pobraniem'].includes(deliveryMethod) && (
+                {['Kurier DPD', 'Kurier InPost'].includes(deliveryMethod) && (
                   <div className='flex flex-col space-y-3'>
                     <h1 className="text-2xl md:text-3xl tracking-widest text-center pt-5">
                       Adres dostawy
@@ -259,6 +306,13 @@ export default function Checkout() {
                 <h1 className="text-2xl md:text-3xl tracking-widest text-center px-2 pt-4 pb-4">
                   Dane kontaktowe
                 </h1>
+                <input
+                  type="name"
+                  placeholder="Imię i nazwisko"
+                  value={customerData.name}
+                  className='ring-1 ring-slate-200 p-2 rounded-lg shadow-md'
+                  onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })}
+                />
                 <input
                   type="email"
                   placeholder="Email"
