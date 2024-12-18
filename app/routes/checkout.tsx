@@ -6,7 +6,6 @@ import { getSession, commitSession } from "../utils/session.server";
 import { json, LoaderFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import { InpostGeowidgetReact } from 'inpost-geowidget-react'
-import { db } from '~/services/index';
 
 
 export const loader: LoaderFunction = async ({ request }) => {
