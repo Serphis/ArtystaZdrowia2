@@ -1,51 +1,44 @@
 import { json } from '@remix-run/node';
-import { db } from '../services/index';
+import { prisma } from '../utils/prisma.server';
 
-export const action = async ({ req }: { req: Request }) => {
-  if (req.method === 'POST') {
-    const formData = new URLSearchParams(await req.text());
-
-    const cart = JSON.parse(formData.get('cart')); // Pobranie danych koszyka z formularza
-    const totalPrice = formData.get('totalPrice');
-    const deliveryMethod = formData.get('deliveryMethod');
-    const paymentMethod = formData.get('paymentMethod');
-    const address = JSON.parse(formData.get('address'));
-    const customerData = JSON.parse(formData.get('customerData'));
-    const parcelLocker = formData.get('parcelLocker');
-    const selectedPoint = JSON.parse(formData.get('selectedPoint'));
-    const zipCode = address.zip || '';
+export const action = async ({ request }: { request: Request }) => {
+    const formData = await request.json();
+    const { cart, totalPrice, deliveryMethod, paymentMethod, address, customerData, parcelLocker, selectedPoint } = formData;
 
     try {
-        // Tworzymy obiekt zamówienia
-        const order = await db.order.create({
+        const newOrder = await prisma.order.create({
             data: {
                 email: customerData.email,
                 receiverName: customerData.name,
                 receiverPhone: customerData.phone,
-                deliveryMethod,
-                paymentMethod,
-                totalPrice: parseFloat(totalPrice),
-                address,  // Adres w formacie JSON
-                parcelLocker,
-                zipCode,
+                deliveryMethod: deliveryMethod,
+                paymentMethod: paymentMethod,
+                totalPrice: totalPrice,
+                address: address,
+                parcelLocker: parcelLocker,
+                zipCode: address.zip,
                 shippingStatus: 'Nie wysłano',
                 status: 'Oczekujące',
                 products: {
-                create: Object.values(cart).map(item => ({
-                    productId: item.productId,
-                    sizeId: item.sizeId,
-                    sizeName: item.sizeName,
-                    sizePrice: item.sizePrice,
-                    quantity: parseInt(item.stock, 10),
-                })),
+                    create: Object.values(cart).map((item: any) => ({
+                      productId: item.productId,
+                      sizeId: item.sizeId,
+                      sizeName: item.sizeName,
+                      sizePrice: item.sizePrice,
+                      quantity: item.stock,
+                    })),
                 },
             },
         });
 
-        return new Response(JSON.stringify({ status: 'success', orderId: newOrder.id }), { status: 200 });
-    } catch (error) {
-      return new Response(JSON.stringify({ status: 'error', message: error.message }), { status: 500 });
-    }
-  }
-};
-    
+        return new Response(
+            JSON.stringify({ status: 'success', orderId: newOrder.id }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } }
+          );
+        } catch (error) {
+          return new Response(
+            JSON.stringify({ status: 'error', message: error.message }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+      };

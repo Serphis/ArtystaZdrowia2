@@ -77,10 +77,8 @@ export default function Checkout() {
   
         const result = await response.json();
         if (result.status === 'success') {
-          // Obsługuje sukces - np. wyświetlenie komunikatu lub przekierowanie
           console.log('Zamówienie zostało złożone:', result.orderId);
         } else {
-          // Obsługuje błąd
           console.error('Błąd składania zamówienia:', result.message);
         }
     } catch (error) {
