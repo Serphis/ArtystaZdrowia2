@@ -1,47 +1,53 @@
-import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+// success.tsx
 
-const Success = () => {
-  const location = useLocation();
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Jeśli używasz react-router
+import { db } from '../services/index'; // Upewnij się, że masz dostęp do swojego db
+
+const SuccessPage = () => {
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const sessionId = queryParams.get('session_id');
+    const updateProductsAndClearCart = async () => {
+      try {
+        // Pobierz dane o zamówieniu (np. z sesji, lokalnego storage, lub przekazane w query params)
+        const orderData = JSON.parse(localStorage.getItem('orderData') || '{}');
 
-    if (sessionId) {
-      // Wysłanie zapytania do backendu, aby zapisać zamówienie w bazie
-      const saveOrder = async () => {
-        try {
-          const response = await fetch('https://www.artystazdrowia.com/databaseHandler', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ sessionId }),  // Przesyłamy ID sesji płatności
-          });
+        if (orderData.cart && Object.keys(orderData.cart).length > 0) {
+          const cartItems = Object.values(orderData.cart);
 
-          const result = await response.json();
-
-          if (result.status === 'success') {
-            console.log('Zamówienie zostało zapisane:', result.orderId);
-          } else {
-            console.error('Błąd zapisania zamówienia:', result.message);
+          // Zaktualizuj bazę danych - zmniejsz ilości produktów
+          for (const item of cartItems) {
+            await db.product.updateMany({
+              where: { id: item.productId },
+              data: {
+                stock: {
+                  decrement: parseInt(item.stock, 10), // Zmniejsz ilość
+                },
+              },
+            });
           }
-        } catch (error) {
-          console.error('Błąd podczas zapisywania zamówienia:', error);
-        }
-      };
 
-      saveOrder();
-    }
-  }, [location.search]);
+          // Wyczyść koszyk z lokalnej pamięci
+          localStorage.removeItem('cart');
+          localStorage.removeItem('orderData');
+
+        }
+      } catch (error) {
+        console.error('Błąd przy aktualizacji produktów lub czyszczeniu koszyka:', error);
+      }
+    };
+
+    updateProductsAndClearCart();
+  }, [navigate]);
 
   return (
-    <div className="text-center">
-      <h1 className="text-3xl">Dziękujemy za zakupy!</h1>
-      <p>Twoje zamówienie zostało złożone pomyślnie.</p>
+    <div className='py-16 text-center flex flex-col items-center'>
+      <h1 className='py-10 text-2xl'>Twoja płatność została zrealizowana pomyślnie!</h1>
+      <p>Dziękujemy za zakupy! :)</p>
+      <img src="https://res.cloudinary.com/djio9fbja/image/upload/f_auto,q_auto/v1/public/zsa7ti63lpljo6spth7p" alt="Opis zdjęcia" className='py-4 md:py-2 w-96 object-cover' />
     </div>
   );
 };
 
-export default Success;
+export default SuccessPage;

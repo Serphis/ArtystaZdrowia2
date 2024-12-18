@@ -54,6 +54,7 @@ export default function Checkout() {
   totalPrice *= 100;
 
   const handleCheckout = async () => {
+
     const orderData = {
       cart,
       totalPrice,
@@ -64,12 +65,33 @@ export default function Checkout() {
       parcelLocker,
       selectedPoint,
     };
+
+    localStorage.setItem('orderData', JSON.stringify(orderData));
+
+    try {
+      const response = await fetch('https://www.artystazdrowia.com/databaseHandler', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      });
   
+        const result = await response.json();
+        if (result.status === 'success') {
+          console.log('Zamówienie zostało złożone:', result.orderId);
+        } else {
+          console.error('Błąd składania zamówienia:', result.message);
+        }
+    } catch (error) {
+      console.error('Błąd połączenia:', error);
+    }
+
     try {
       const items = Object.values(cart).map(item => ({
         id: `${item.name}-${item.sizeName}`,
         quantity: parseInt(item.stock, 10),
-        price: parseInt(item.sizePrice) * 100,
+        price: parseInt(item.sizePrice)*100,
       }));
   
       const response = await fetch('https://www.artystazdrowia.com/stripeHandler', {
@@ -79,37 +101,42 @@ export default function Checkout() {
         },
         body: JSON.stringify({ items }),
       });
-  
+
+      // Sprawdzenie odpowiedzi HTTP
       if (!response.ok) {
         console.error('Błąd HTTP:', response.status, response.statusText);
+        const responseClone = response.clone();
+        const errorText = await responseClone.text();
+        console.error('Treść odpowiedzi (HTML):', errorText);
         alert('Błąd podczas tworzenia sesji płatności. Skontaktuj się z obsługą.');
         return;
       }
-  
+
       let session;
       try {
         session = await response.json();
       } catch (jsonError) {
+        const responseClone = response.clone();
+        const errorText = await responseClone.text();
         console.error('Błąd parsowania JSON:', jsonError);
+        console.error('Treść odpowiedzi (HTML):', errorText);
         alert('Błąd podczas przetwarzania danych płatności. Skontaktuj się z obsługą.');
         return;
       }
-  
+
       if (session.error) {
         console.error(session.error);
         alert('Błąd podczas tworzenia sesji płatności: ' + session.error.message);
         return;
       }
-  
+
       const stripe = await stripePromise;
       if (!stripe) {
         alert('Stripe nie został poprawnie załadowany.');
         return;
       }
-  
-      // Przekierowanie użytkownika na stronę sukcesu po zakończonej płatności
-      const { error } = await stripe.redirectToCheckout({ sessionId: session.id });
-  
+      const { error } = await stripe!.redirectToCheckout({ sessionId: session.id });
+
       if (error) {
         console.error(error.message);
         alert('Wystąpił błąd podczas przekierowania do płatności.');
@@ -119,7 +146,8 @@ export default function Checkout() {
       alert('Wystąpił błąd podczas obsługi płatności. Spróbuj ponownie później.');
     }
   };
-  
+    
+
     // const handleCheckout = async () => {
     //     const items = Object.values(cart).map(item => ({
     //       id: `${item.name}-${item.sizeName}`, // Możesz użyć kombinacji nazwy i rozmiaru jako unikalnego id
