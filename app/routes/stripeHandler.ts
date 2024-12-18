@@ -11,13 +11,13 @@ export const action = async ({ request }: { request: Request }) => {
     try {
       const { items } = await request.json();
   
-      const lineItems = items.map((item: { id: string; quantity: number }) => ({
+      const lineItems = items.map((item: { id: string; quantity: number, price: number }) => ({
         price_data: {
           currency: 'pln',
           product_data: {
             name: item.id,
           },
-          unit_amount: 4999,
+          unit_amount: item.price,
         },
         quantity: item.quantity,
       }));
