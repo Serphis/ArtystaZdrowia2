@@ -10,7 +10,8 @@ export async function getCartData(session) {
 
   const matchedItems = {};
   let totalPrice = 0;
-  
+  let shouldClearCart = false; // Flaga, która będzie wskazywała, czy koszyk powinien zostać wyczyszczony
+
   // Przechodzimy przez produkty w koszyku
   for (const key in cart) {
     for (const productKey in products) {
@@ -41,9 +42,9 @@ export async function getCartData(session) {
           const availableStock = matchedSize.stock;  // Załóżmy, że `stock` to pole w tabeli `size`
           const requestedStock = cart[key].stock || 1;
 
-          // Jeśli stock w bazie wynosi 0, usuwamy produkt z koszyka
+          // Jeśli stock w bazie wynosi 0, oznaczamy, że koszyk powinien zostać wyczyszczony
           if (availableStock === 0) {
-            delete cart[key]; // Usuwamy produkt z koszyka
+            shouldClearCart = true;
             continue; // Przechodzimy do kolejnego produktu w koszyku
           }
 
@@ -55,11 +56,14 @@ export async function getCartData(session) {
     }
   }
 
-  // Po usunięciu produktów, zapisujemy zaktualizowany koszyk w sesji
-  session.set("cart", cart);
+  // Jeśli którykolwiek produkt ma stock === 0, czyścimy koszyk
+  if (shouldClearCart) {
+    session.set("cart", {});
+  }
 
   return { matchedItems, totalPrice };
 }
+
 
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
