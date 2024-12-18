@@ -3,7 +3,9 @@ import { prisma } from '../utils/prisma.server';
 import Stripe from 'stripe';
 
 // Inicjalizacja Stripe z kluczem prywatnym
-const stripe = new Stripe('YOUR_STRIPE_SECRET_KEY', { apiVersion: '2022-11-15' });
+const stripe = new Stripe(`${process.env.SEKRETNY_KLUCZ_STRIPE}`, {
+  apiVersion: '2024-11-20.acacia',
+});
 
 export const action = async ({ request }: { request: Request }) => {
     const formData = await request.json();
