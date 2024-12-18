@@ -83,7 +83,7 @@ export default function Checkout() {
             price: parseInt(item.sizePrice)*100,
           }));
       
-          const response = await fetch('https://www.artystazdrowia.com/create-checkout-session', {
+          const response = await fetch('https://www.artystazdrowia.com/stripeHandler', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
