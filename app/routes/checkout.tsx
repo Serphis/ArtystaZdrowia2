@@ -74,12 +74,7 @@ export default function Checkout() {
       //   },
       //   items: items,
       // };
-
-      if (!stripePromise) {
-        console.error('StripePromise jest niezdefiniowane lub ma wartość null.');
-        return;
-      }
-
+      
       alert(stripePromise);
 
 
