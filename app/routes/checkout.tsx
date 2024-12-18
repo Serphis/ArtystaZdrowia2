@@ -56,7 +56,7 @@ export default function Checkout() {
       const handleCheckout = async () => {
         try {
           const items = Object.values(cart).map(item => ({
-            id: `${item.name}-${item.sizeId}`,
+            id: `${item.name}-${item.sizeName}`,
             quantity: parseInt(item.stock, 10),
             price: parseInt(item.sizePrice)*100,
           }));
