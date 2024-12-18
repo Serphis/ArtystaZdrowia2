@@ -28,7 +28,6 @@ export const loader: LoaderFunction = async ({ request }) => {
       });
     }
 
-    // Wyczyść dane zamówienia z sesji
     if (cart && Object.keys(cart).length > 0) {
 
       session.set("cart", {});
