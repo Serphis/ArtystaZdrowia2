@@ -7,20 +7,19 @@ import { json, LoaderFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import { InpostGeowidgetReact } from 'inpost-geowidget-react'
 
-
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
 
   const { matchedItems, totalPrice } = await getCartData(session);
 
-  return json({ cart: matchedItems, totalPrice });
+  return json({ session, cart: matchedItems, totalPrice });
 };
 
 const stripePromise = loadStripe('pk_test_51QWDzLC66ozEbyTE3bWJdZCIgsFId1VpLZ35NaR67Xbn16UbxLJ9iEvYTinebp7KmbYncMmdlWRtchkGBjzuVH4o00NbPwKvop');
 
 export default function Checkout() {
 
-  let { cart, totalPrice } = useLoaderData();
+  let { session, cart, totalPrice } = useLoaderData();
 
   const [deliveryMethod, setDeliveryMethod] = useState('Kurier InPost');
   const [paymentMethod, setPaymentMethod] = useState('online');
@@ -54,7 +53,6 @@ export default function Checkout() {
   totalPrice *= 100;
 
   const handleCheckout = async () => {
-    const session = await getSession();
 
     const orderData = {
       cart,
