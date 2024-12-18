@@ -29,7 +29,7 @@ export const action: ActionFunction = async ({ request }) => {
     data: { stock: newStock },
   });
 
-  return redirect('/adminPanel');
+  return redirect('/admin/product/stock');
 };
 export default function AdminProductList() {
     const { products } = useLoaderData();
