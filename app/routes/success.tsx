@@ -7,8 +7,9 @@ import { getSession, commitSession } from "../utils/session.server";
 // Loader: Pobiera dane zamówienia z sesji i czyści sesję po przetworzeniu
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
+  const order = session.get("order");
   const orderData = session.get("orderData") || null;
-  const cart = session.get("cart")
+  const cart = session.get("cart");
 
   if (!orderData || Object.keys(orderData.products).length === 0) {
     return json({ message: "Brak danych zamówienia.", error: true });
@@ -33,6 +34,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
       session.set("cart", {});
       session.set("orderData", {});
+      session.set("order", {});
 
       return redirect("/success", {
         headers: {
