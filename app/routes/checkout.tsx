@@ -65,11 +65,6 @@ export default function Checkout() {
       selectedPoint,
     };
 
-    session.set('orderData', orderData);
-
-    const headers = new Headers();
-    headers.append("Set-Cookie", await commitSession(session));  
-
     try {
       const response = await fetch('https://www.artystazdrowia.com/databaseHandler', {
         method: 'POST',

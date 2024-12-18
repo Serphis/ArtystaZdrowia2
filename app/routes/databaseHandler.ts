@@ -1,9 +1,16 @@
 import { json } from '@remix-run/node';
 import { prisma } from '../utils/prisma.server';
+import { getSession, commitSession } from "../utils/session.server";
 
 export const action = async ({ request }: { request: Request }) => {
     const formData = await request.json();
-    const { cart, totalPrice, deliveryMethod, paymentMethod, address, customerData, parcelLocker, selectedPoint } = formData;
+    const { orderData, cart, totalPrice, deliveryMethod, paymentMethod, address, customerData, parcelLocker, selectedPoint } = formData;
+    const session = await getSession(request);
+
+    session.set('orderData', orderData);
+
+    const headers = new Headers();
+    headers.append("Set-Cookie", await commitSession(session));  
 
     try {
         const newOrder = await prisma.order.create({
