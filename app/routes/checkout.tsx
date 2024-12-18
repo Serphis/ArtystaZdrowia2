@@ -58,7 +58,6 @@ export default function Checkout() {
           const items = Object.values(cart).map(item => ({
             id: `${item.name}-${item.sizeId}`,
             quantity: parseInt(item.stock, 10),
-            price: parseInt(item.sizePrice)
           }));
       
           const response = await fetch('https://www.artystazdrowia.com/stripeHandler', {
