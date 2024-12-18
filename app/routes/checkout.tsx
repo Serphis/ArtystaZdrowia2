@@ -53,33 +53,11 @@ export default function Checkout() {
 
   totalPrice *= 100;
 
-  // const orderData = {
-      //   customer: {
-      //     email: customerData.email,
-      //     name: customerData.name,
-      //     phone: customerData.phone,
-      //   },
-      //   delivery: {
-      //     method: deliveryMethod,
-      //     parcelLocker: parcelLocker,
-      //     address: {
-      //       city: address.city,
-      //       street: address.street,
-      //       zip: address.zip,
-      //     },
-      //   },
-      //   payment: {
-      //     method: paymentMethod,
-      //     totalPrice: totalPrice,
-      //   },
-      //   items: items,
-      // };
-
       const handleCheckout = async () => {
         try {
           const items = Object.values(cart).map(item => ({
-            id: `${item.name}-${item.sizeId}`, // Możesz użyć kombinacji nazwy i rozmiaru jako unikalnego id
-            quantity: parseInt(item.stock, 10), // Liczba sztuk na podstawie pola `stock`
+            id: `${item.name}-${item.sizeId}`,
+            quantity: parseInt(item.stock, 10),
           }));
       
           const response = await fetch('https://www.artystazdrowia.com/stripeHandler', {
@@ -102,7 +80,6 @@ export default function Checkout() {
     
           let session;
           try {
-            // Próba parsowania odpowiedzi jako JSON
             session = await response.json();
           } catch (jsonError) {
             const responseClone = response.clone();
@@ -113,14 +90,12 @@ export default function Checkout() {
             return;
           }
     
-          // Sprawdzenie, czy sesja zawiera błąd
           if (session.error) {
             console.error(session.error);
             alert('Błąd podczas tworzenia sesji płatności: ' + session.error.message);
             return;
           }
     
-          // Pobranie Stripe i przekierowanie do płatności
           const stripe = await stripePromise;
           if (!stripe) {
             alert('Stripe nie został poprawnie załadowany.');

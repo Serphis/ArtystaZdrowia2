@@ -9,60 +9,32 @@ const stripe = new Stripe(`${process.env.SEKRETNY_KLUCZ_STRIPE}`, {
 export const action = async ({ request }: { request: Request }) => {
   if (request.method === 'POST') {
     try {
-      const { items } = await request.json(); // Odbieramy dane z ciała zapytania (items)
+      const { items } = await request.json();
   
-      // Tworzymy linie zamówienia
       const lineItems = items.map((item: { id: string; quantity: number }) => ({
         price_data: {
           currency: 'pln',
           product_data: {
-            name: item.id, // Nazwa produktu np. "Świeczka zapachowa"
+            name: item.id,
           },
-          unit_amount: 4999, // Cena w groszach (np. 49.99 zł)
+          unit_amount: 4999,
         },
         quantity: item.quantity,
       }));
 
-      // Tworzymy sesję Stripe Checkout
       const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card', 'blik'], // Obsługiwane metody płatności
+        payment_method_types: ['card', 'blik'],
         line_items: lineItems,
         mode: 'payment',
-        success_url: `${new URL('https://www.artystazdrowia.com//success', request.url)}`, // URL po udanej płatności
-        cancel_url: `${new URL('https://www.artystazdrowia.com//cancel', request.url)}`, // URL po anulowaniu płatności
+        success_url: `${new URL('https://www.artystazdrowia.com//success', request.url)}`,
+        cancel_url: `${new URL('https://www.artystazdrowia.com//cancel', request.url)}`,
       });
 
-      // Zwracamy ID sesji Stripe
       return json({ id: session.id });
     } catch (err: any) {
       console.error(err);
       return json({ error: err.message }, { status: 500 });
     }
   }
-  // Jeśli metoda nie jest POST, zwróć 405
   return null;
 };
-
-// export const action = async ({ request }: { request: Request }) => {
-//   if (request.method === 'POST') {
-//     try {
-//       const formData = new URLSearchParams(await request.text());
-//       const lineItems = JSON.parse(formData.get('line_items') || '[]');
-  
-//       // Tworzymy sesję Stripe Checkout
-//       const session = await stripe.checkout.sessions.create({
-//         payment_method_types: ['card'],  // Możliwe metody płatności (np. karta)
-//         line_items: lineItems,  // Przedmioty płatności
-//         mode: 'payment',  // Tryb płatności
-//         success_url: 'https://www.artystazdrowia.com/success',  // URL po sukcesie
-//         return_url: 'https://www.artystazdrowia.com/return',    // URL po anulowaniu
-//       });
-  
-//       // Zwracamy ID sesji Stripe, aby przekierować do checkout
-//       return json({ id: session.id });
-//     } catch (error) {
-//       console.error('Błąd podczas tworzenia sesji Stripe:', error);
-//       return json({ error: 'Wystąpił błąd podczas tworzenia sesji płatności.' }, { status: 500 });
-//     }
-//   }
-// }  
