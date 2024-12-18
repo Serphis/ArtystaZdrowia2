@@ -67,30 +67,11 @@ export default function Checkout() {
     };
 
     try {
-      const response = await fetch('https://www.artystazdrowia.com/databaseHandler', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData),
-      });
-  
-        const result = await response.json();
-        if (result.status === 'success') {
-          console.log('Zamówienie zostało złożone:', result.orderId);
-        } else {
-          console.error('Błąd składania zamówienia:', result.message);
-        }
-    } catch (error) {
-      console.error('Błąd połączenia:', error);
-    }
-  
-
-    try {
+      // 1. Tworzymy sesję płatności na Stripe
       const items = Object.values(cart).map(item => ({
         id: `${item.name}-${item.sizeName}`,
         quantity: parseInt(item.stock, 10),
-        price: parseInt(item.sizePrice)*100,
+        price: parseInt(item.sizePrice) * 100,
       }));
   
       const response = await fetch('https://www.artystazdrowia.com/stripeHandler', {
@@ -100,8 +81,7 @@ export default function Checkout() {
         },
         body: JSON.stringify({ items }),
       });
-
-      // Sprawdzenie odpowiedzi HTTP
+  
       if (!response.ok) {
         console.error('Błąd HTTP:', response.status, response.statusText);
         const responseClone = response.clone();
@@ -110,7 +90,7 @@ export default function Checkout() {
         alert('Błąd podczas tworzenia sesji płatności. Skontaktuj się z obsługą.');
         return;
       }
-
+  
       let session;
       try {
         session = await response.json();
@@ -122,24 +102,50 @@ export default function Checkout() {
         alert('Błąd podczas przetwarzania danych płatności. Skontaktuj się z obsługą.');
         return;
       }
-
+  
       if (session.error) {
         console.error(session.error);
         alert('Błąd podczas tworzenia sesji płatności: ' + session.error.message);
         return;
       }
-
+  
+      // Upewniamy się, że Stripe jest załadowany
       const stripe = await stripePromise;
       if (!stripe) {
         alert('Stripe nie został poprawnie załadowany.');
         return;
       }
-      const { error } = await stripe!.redirectToCheckout({ sessionId: session.id });
-
+  
+      // Przekierowanie do Stripe Checkout
+      const { error } = await stripe.redirectToCheckout({ sessionId: session.id });
+  
       if (error) {
         console.error(error.message);
         alert('Wystąpił błąd podczas przekierowania do płatności.');
       }
+  
+      // 2. Jeśli płatność została pomyślnie dokonana, wykonaj zapis zamówienia do bazy
+      // Płatność udana, możemy teraz zapisać zamówienie w bazie danych
+      const paymentIntent = session.payment_intent;
+  
+      const orderResponse = await fetch('https://www.artystazdrowia.com/databaseHandler', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...orderData,
+          paymentIntent,  // Zawiera ID płatności
+        }),
+      });
+  
+      const orderResult = await orderResponse.json();
+      if (orderResult.status === 'success') {
+        console.log('Zamówienie zostało złożone:', orderResult.orderId);
+      } else {
+        console.error('Błąd składania zamówienia:', orderResult.message);
+      }
+  
     } catch (error) {
       console.error('Błąd podczas obsługi płatności:', error);
       alert('Wystąpił błąd podczas obsługi płatności. Spróbuj ponownie później.');
