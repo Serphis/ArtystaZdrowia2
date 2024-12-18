@@ -25,7 +25,7 @@ export const action = async ({ request }: { request: Request }) => {
                       sizeId: item.sizeId,
                       sizeName: item.sizeName,
                       sizePrice: item.sizePrice,
-                      quantity: item.stock,
+                      quantity: parseInt(item.stock),
                     })),
                 },
             },
