@@ -11,7 +11,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   console.log(orderData)
 
-  return { orderData }
+  return null
 
   // if (!orderData || Object.keys(orderData.products).length === 0) {
   //   return json({ message: "Brak danych zamówienia.", error: true });
