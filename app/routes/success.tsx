@@ -29,7 +29,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
 
     // Wyczyść dane zamówienia z sesji
-    if (cart && Object.keys(cart).length > 0) {
+    if (Object.keys(cart).length !== 0) {
 
       session.set("cart", {});
       session.set("orderData", {});
@@ -47,7 +47,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 };
 
-// Komponent SuccessPage
 const SuccessPage = () => {
 
   return (
