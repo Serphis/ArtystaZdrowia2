@@ -8,7 +8,6 @@ import { getSession, commitSession } from "../utils/session.server";
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
   const orderData = session.get("orderData") || null;
-  const cart = session.get("cart");
 
   if (!orderData || Object.keys(orderData.products).length === 0) {
     return json({ message: "Brak danych zamówienia.", error: true });
@@ -22,26 +21,13 @@ export const loader: LoaderFunction = async ({ request }) => {
         where: { id: item.sizeId },
         data: {
           stock: {
-            decrement: parseInt(item.stock, 10), // quantity musi być liczbą całkowitą
+            decrement: parseInt(item.stock, 10), // ilość musi być liczbą całkowitą
           },
         },
       });
     }
 
-    if (cart && Object.keys(cart).length !== 0) {
-      session.unset("cart");
-      session.unset("orderData");
-      session.unset("order");
-
-      const commit = await commitSession(session);
-
-      return redirect("/success", {
-        headers: {
-          "Set-Cookie": commit,
-        },
-      });
-    }
-    return null;
+    return json({ message: "Zaktualizowano stany magazynowe.", success: true });
   } catch (error) {
     console.error("Błąd przy aktualizacji produktów:", error);
     return json({ message: "Wystąpił problem z realizacją zamówienia.", error: true });
