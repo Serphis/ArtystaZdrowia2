@@ -11,7 +11,7 @@ const SuccessPage = () => {
     const updateProductsAndClearCart = async () => {
       try {
         // Pobierz dane o zamówieniu (np. z sesji, lokalnego storage, lub przekazane w query params)
-        const orderData = JSON.parse(localStorage.getItem('orderData') || '{}');
+        const orderData = JSON.parse(localStorage.getItem('order') || '{}');
 
         if (orderData.cart && Object.keys(orderData.cart).length > 0) {
           const cartItems = Object.values(orderData.cart);
