@@ -1,4 +1,5 @@
 import { json, Request, Response } from '@remix-run/node';
+import { response } from 'express';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(`${process.env.SEKRETNY_KLUCZ_STRIPE}`, {
@@ -39,7 +40,7 @@ export const action = async ({ request }: { request: Request }) => {
     }
   }
   // Jeśli metoda nie jest POST, zwróć 405
-  return new Response('Method Not Allowed', { status: 405 });
+  return null;
 };
 
 // export const action = async ({ request }: { request: Request }) => {
