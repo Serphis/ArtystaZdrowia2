@@ -9,9 +9,11 @@ const stripe = new Stripe(`${process.env.SEKRETNY_KLUCZ_STRIPE}`, {
 export const action = async ({ req }: { req: Request }) => {
   if (req.method === 'POST') {
     try {
-      const { orderData } = await req.json();
+      const { items } = await req.json();
 
-      const lineItems = orderData.items.map((item) => ({
+
+
+      const lineItems = items.map((item) => ({
         price_data: {
           currency: 'pln',
           product_data: {
@@ -30,7 +32,7 @@ export const action = async ({ req }: { req: Request }) => {
         cancel_url: `${new URL('https://www.artystazdrowia.com/cancel', req.url)}`,
       });
 
-      return json({ sessionId: session.id });
+      return json({ id: session.id });
     } catch (error: any) {
       console.error('Error creating Stripe session:', error);
       return json({ message: 'Stripe session creation failed', error: error.message }, { status: 500 });
