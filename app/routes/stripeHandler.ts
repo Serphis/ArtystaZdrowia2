@@ -21,7 +21,7 @@ export const action = async ({ request }: { request: Request }) => {
       });
   
       // Zwracamy ID sesji Stripe, aby przekierować do checkout
-      return  { id: session.id } ;
+      return json({ id: session.id });
     } catch (error) {
       console.error('Błąd podczas tworzenia sesji Stripe:', error);
       return json({ error: 'Wystąpił błąd podczas tworzenia sesji płatności.' }, { status: 500 });
