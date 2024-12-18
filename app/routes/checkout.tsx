@@ -54,6 +54,7 @@ export default function Checkout() {
   totalPrice *= 100;
 
   const handleCheckout = async () => {
+    const session = await getSession();
 
     const orderData = {
       cart,
@@ -66,7 +67,10 @@ export default function Checkout() {
       selectedPoint,
     };
 
-    localStorage.setItem('orderData', JSON.stringify(orderData));
+    session.set('orderData', orderData);
+
+    const headers = new Headers();
+    headers.append("Set-Cookie", await commitSession(session));  
 
     try {
       const response = await fetch('https://www.artystazdrowia.com/databaseHandler', {

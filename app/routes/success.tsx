@@ -7,40 +7,44 @@ import { getSession, commitSession } from "../utils/session.server";
 // Loader: Pobiera dane zamówienia z sesji i czyści sesję po przetworzeniu
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
-  const orderData = session.get("order") || null;
+  const orderData = session.get("orderData") || null;
 
-  if (!orderData || Object.keys(orderData.products).length === 0) {
-    return json({ message: "Brak danych zamówienia.", error: true });
-  }
+  console.log(orderData)
+
+  return { orderData }
+
+  // if (!orderData || Object.keys(orderData.products).length === 0) {
+  //   return json({ message: "Brak danych zamówienia.", error: true });
+  // }
 
   // Zaktualizuj ilości produktów w bazie danych
-  try {
-    const cartItems = orderData.products;
+  // try {
+  //   const cartItems = orderData.products;
 
-    for (const item of cartItems) {
-      await db.size.update({
-        where: { id: item.sizeId },
-        data: {
-          stock: {
-            decrement: parseInt(item.stock, 10), // quantity musi być liczbą całkowitą
-          },
-        },
-      });
-    }
+  //   for (const item of cartItems) {
+  //     await db.size.update({
+  //       where: { id: item.sizeId },
+  //       data: {
+  //         stock: {
+  //           decrement: parseInt(item.stock, 10), // quantity musi być liczbą całkowitą
+  //         },
+  //       },
+  //     });
+  //   }
 
-    // Wyczyść dane zamówienia z sesji
-    session.set("cart", {});
-    session.set("order", {});
+  //   // Wyczyść dane zamówienia z sesji
+  //   session.set("cart", {});
+  //   session.set("orderData", {});
 
-    return redirect("/success", {
-      headers: {
-        "Set-Cookie": await commitSession(session),
-      },
-    });
-  } catch (error) {
-    console.error("Błąd przy aktualizacji produktów:", error);
-    return json({ message: "Wystąpił problem z realizacją zamówienia.", error: true });
-  }
+  //   return redirect("/success", {
+  //     headers: {
+  //       "Set-Cookie": await commitSession(session),
+  //     },
+  //   });
+  // } catch (error) {
+  //   console.error("Błąd przy aktualizacji produktów:", error);
+  //   return json({ message: "Wystąpił problem z realizacją zamówienia.", error: true });
+  // }
 };
 
 // Komponent SuccessPage
