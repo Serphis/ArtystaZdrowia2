@@ -65,6 +65,8 @@ export default function Checkout() {
       selectedPoint,
     };
 
+    console.log(orderData)
+
     try {
       const response = await fetch('https://www.artystazdrowia.com/databaseHandler', {
         method: 'POST',
