@@ -35,7 +35,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
       const commit = await commitSession(session);
     
-      return redirect("/success", {
+      return redirect("/", {
         headers: {
           "Set-Cookie": commit,
         },
