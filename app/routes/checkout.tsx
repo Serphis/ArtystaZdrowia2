@@ -242,7 +242,7 @@ export default function Checkout() {
                 <h1 className="text-2xl md:text-3xl tracking-widest text-center px-2 pt-4 pb-4">
                   Metoda wysyłki
                 </h1>
-                <label>
+                {/* <label>
                   <input
                     type="radio"
                     name="deliveryMethod"
@@ -251,7 +251,7 @@ export default function Checkout() {
                     onChange={() => setDeliveryMethod('Paczkomat')}
                   />
                   Paczkomat
-                </label>
+                </label> */}
                 <label>
                   <input
                     type="radio"
@@ -327,7 +327,7 @@ export default function Checkout() {
                   />
                   Płatność online
                 </label>
-                <label>
+                {/* <label>
                   <input
                     type="radio"
                     name="paymentMethod"
@@ -336,7 +336,7 @@ export default function Checkout() {
                     onChange={() => setPaymentMethod('cod')}
                   />
                   Płatność za pobraniem
-                </label>
+                </label> */}
               </div>
               <div className='flex flex-col text-xl py-2 space-y-2'>
                 <h1 className="text-2xl md:text-3xl tracking-widest text-center px-2 pt-4 pb-4">
