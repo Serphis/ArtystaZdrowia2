@@ -11,11 +11,11 @@ export const action = async ({ req }: { req: Request }) => {
     try {
       const { items } = await req.json();
 
-      const lineItems = items.map((item: { id: string; quantity: number; price: number }) => ({
+      const lineItems = items.map((item: { id: string; name: string; quantity: number; price: number }) => ({
         price_data: {
           currency: 'pln',
           product_data: {
-            name: item.id,
+            name: item.name
           },
           unit_amount: item.price,
         },
@@ -27,7 +27,7 @@ export const action = async ({ req }: { req: Request }) => {
         line_items: lineItems,
         mode: 'payment',
         success_url: `${new URL('https://www.artystazdrowia.com/success', req.url)}`,
-        cancel_url: `${new URL('https://www.artystazdrowia.com/cancel', req.url)}`,
+        return_url: `${new URL('https://www.artystazdrowia.com/return', req.url)}`,
       });
 
       return json({ id: session.id });
