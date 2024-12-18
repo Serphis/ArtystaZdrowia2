@@ -54,7 +54,6 @@ export default function Checkout() {
   totalPrice *= 100;
 
   const handleCheckout = async () => {
-    // Przygotuj dane o zamówieniu, ale nie zapisuj go jeszcze w bazie
     const orderData = {
       cart,
       totalPrice,
@@ -67,7 +66,6 @@ export default function Checkout() {
     };
   
     try {
-      // 1. Tworzymy sesję płatności na Stripe
       const items = Object.values(cart).map(item => ({
         id: `${item.name}-${item.sizeName}`,
         quantity: parseInt(item.stock, 10),
@@ -84,9 +82,6 @@ export default function Checkout() {
   
       if (!response.ok) {
         console.error('Błąd HTTP:', response.status, response.statusText);
-        const responseClone = response.clone();
-        const errorText = await responseClone.text();
-        console.error('Treść odpowiedzi (HTML):', errorText);
         alert('Błąd podczas tworzenia sesji płatności. Skontaktuj się z obsługą.');
         return;
       }
@@ -95,10 +90,7 @@ export default function Checkout() {
       try {
         session = await response.json();
       } catch (jsonError) {
-        const responseClone = response.clone();
-        const errorText = await responseClone.text();
         console.error('Błąd parsowania JSON:', jsonError);
-        console.error('Treść odpowiedzi (HTML):', errorText);
         alert('Błąd podczas przetwarzania danych płatności. Skontaktuj się z obsługą.');
         return;
       }
@@ -109,49 +101,25 @@ export default function Checkout() {
         return;
       }
   
-      // Upewniamy się, że Stripe jest załadowany
       const stripe = await stripePromise;
       if (!stripe) {
         alert('Stripe nie został poprawnie załadowany.');
         return;
       }
   
-      // Przekierowanie do Stripe Checkout
+      // Przekierowanie użytkownika na stronę sukcesu po zakończonej płatności
       const { error } = await stripe.redirectToCheckout({ sessionId: session.id });
   
       if (error) {
         console.error(error.message);
         alert('Wystąpił błąd podczas przekierowania do płatności.');
       }
-  
-      // 2. Jeśli płatność została pomyślnie dokonana, wykonaj zapis zamówienia do bazy
-      // Płatność udana, możemy teraz zapisać zamówienie w bazie danych
-      const paymentIntent = session.payment_intent;
-  
-      const orderResponse = await fetch('https://www.artystazdrowia.com/databaseHandler', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...orderData,
-          paymentIntent,  // Zawiera ID płatności
-        }),
-      });
-  
-      const orderResult = await orderResponse.json();
-      if (orderResult.status === 'success') {
-        console.log('Zamówienie zostało złożone:', orderResult.orderId);
-      } else {
-        console.error('Błąd składania zamówienia:', orderResult.message);
-      }
-  
     } catch (error) {
       console.error('Błąd podczas obsługi płatności:', error);
       alert('Wystąpił błąd podczas obsługi płatności. Spróbuj ponownie później.');
     }
-  };    
-
+  };
+  
     // const handleCheckout = async () => {
     //     const items = Object.values(cart).map(item => ({
     //       id: `${item.name}-${item.sizeName}`, // Możesz użyć kombinacji nazwy i rozmiaru jako unikalnego id
