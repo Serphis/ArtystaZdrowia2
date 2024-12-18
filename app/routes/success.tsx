@@ -11,10 +11,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   const orderData = session.get("orderData") || null;
   const cart = session.get("cart");
 
-  alert(order)
-  alert(orderData)
-  alert(cart)
-
   if (!orderData || Object.keys(orderData.products).length === 0) {
     return json({ message: "Brak danych zamówienia.", error: true });
   }
