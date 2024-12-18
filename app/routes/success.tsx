@@ -8,7 +8,6 @@ import { getSession, commitSession } from "../utils/session.server";
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
   const orderData = session.get("orderData") || null;
-  const cart = session.get("cart")
 
   if (!orderData || Object.keys(orderData.products).length === 0) {
     return json({ message: "Brak danych zamówienia.", error: true });
@@ -28,15 +27,17 @@ export const loader: LoaderFunction = async ({ request }) => {
       });
     }
 
-    // Wyczyść dane zamówienia z sesji
-    if (Object.keys(cart).length !== 0) {
+    if (Object.keys(orderData.products).length !== 0) {
 
-      session.set("cart", {});
-      session.set("orderData", {});
+      Object.keys(session.data).forEach(key => {
+        session.unset(key);
+      });
 
+      const commit = await commitSession(session);
+    
       return redirect("/success", {
         headers: {
-          "Set-Cookie": await commitSession(session),
+          "Set-Cookie": commit,
         },
       });
     }
