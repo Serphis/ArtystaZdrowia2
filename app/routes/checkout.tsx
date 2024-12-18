@@ -74,9 +74,6 @@ export default function Checkout() {
       //   },
       //   items: items,
       // };
-      
-      alert(stripePromise);
-
 
       const handleCheckout = async () => {
         try {
