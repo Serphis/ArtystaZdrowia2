@@ -18,20 +18,20 @@ export const loader: LoaderFunction = async ({ request }) => {
 
     
 
-    // for (const item of cartItems) {
-    //   await db.size.update({
-    //     where: { id: item.sizeId },
-    //     data: {
-    //       stock: {
-    //         decrement: parseInt(item.stock, 10), // quantity musi być liczbą całkowitą
-    //       },
-    //     },
-    //   });
-    // }
+    for (const item of cartItems) {
+      await db.size.update({
+        where: { id: item.sizeId },
+        data: {
+          stock: {
+            decrement: parseInt(item.stock, 10), // quantity musi być liczbą całkowitą
+          },
+        },
+      });
+    }
 
     // Wyczyść dane zamówienia z sesji
     session.set("cart", {});
-    session.unset("order");
+    session.set("order", {});
 
     return redirect("/success", {
       headers: {
