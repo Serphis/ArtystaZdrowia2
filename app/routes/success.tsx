@@ -4,6 +4,7 @@ import { LoaderFunction, json, redirect } from "@remix-run/node";
 import { db } from "../services/index";
 import { getSession, commitSession } from "../utils/session.server";
 
+// Loader: Pobiera dane zamówienia z sesji i czyści sesję po przetworzeniu
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
   const orderData = session.get("order") || null;
@@ -15,8 +16,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   // Zaktualizuj ilości produktów w bazie danych
   try {
     const cartItems = orderData.products;
-
-    
 
     for (const item of cartItems) {
       await db.size.update({
