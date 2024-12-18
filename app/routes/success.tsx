@@ -31,9 +31,8 @@ export const loader: LoaderFunction = async ({ request }) => {
     // Wyczyść dane zamówienia z sesji
     if (Object.keys(cart).length !== 0) {
 
-      Object.keys(session.data).forEach(key => {
-        session.unset(key);  // Usuwa każdy klucz z sesji
-      });
+      session.set("cart", {});
+      session.set("orderData", {});
 
       return redirect("/success", {
         headers: {
