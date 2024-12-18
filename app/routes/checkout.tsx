@@ -58,6 +58,7 @@ export default function Checkout() {
           const items = Object.values(cart).map(item => ({
             id: `${item.name}-${item.sizeId}`,
             quantity: parseInt(item.stock, 10),
+            price: parseInt(item.sizePrice)*100,
           }));
       
           const response = await fetch('https://www.artystazdrowia.com/stripeHandler', {
@@ -65,7 +66,7 @@ export default function Checkout() {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ items, totalPrice }),
+            body: JSON.stringify({ items }),
           });
     
           // Sprawdzenie odpowiedzi HTTP

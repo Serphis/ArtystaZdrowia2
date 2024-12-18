@@ -9,15 +9,15 @@ const stripe = new Stripe(`${process.env.SEKRETNY_KLUCZ_STRIPE}`, {
 export const action = async ({ request }: { request: Request }) => {
   if (request.method === 'POST') {
     try {
-      const { items, totalPrice } = await request.json();
+      const { items } = await request.json();
   
-      const lineItems = items.map((item: { id: string; quantity: number }) => ({
+      const lineItems = items.map((item: { id: string; quantity: number; price: number }) => ({
         price_data: {
           currency: 'pln',
           product_data: {
             name: item.id,
           },
-          unit_amount: totalPrice,
+          unit_amount: item.price,
         },
         quantity: item.quantity,
       }));
