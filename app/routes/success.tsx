@@ -7,7 +7,6 @@ import { getSession, commitSession } from "../utils/session.server";
 // Loader: Pobiera dane zamówienia z sesji i czyści sesję po przetworzeniu
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
-  const order = session.get("order");
   const orderData = session.get("orderData") || null;
   const cart = session.get("cart");
 
@@ -29,15 +28,16 @@ export const loader: LoaderFunction = async ({ request }) => {
       });
     }
 
-    if (Object.keys(cart).length !== 0) {
+    if (cart && Object.keys(cart).length !== 0) {
+      session.unset("cart");
+      session.unset("orderData");
+      session.unset("order");
 
-      session.set("cart", {});
-      session.set("orderData", {});
-      session.set("order", {});
+      const commit = await commitSession(session);
 
       return redirect("/success", {
         headers: {
-          "Set-Cookie": await commitSession(session),
+          "Set-Cookie": commit,
         },
       });
     }
