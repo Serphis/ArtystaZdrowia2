@@ -12,7 +12,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     return json({ message: "Brak danych zamówienia.", error: true });
   }
 
-  try {
     const cartItems = orderData.products;
 
     for (const item of cartItems) {
@@ -26,12 +25,19 @@ export const loader: LoaderFunction = async ({ request }) => {
       });
     }
 
-    return json({ message: "Zaktualizowano stany magazynowe.", success: true });
-  } catch (error) {
-    console.error("Błąd przy aktualizacji produktów:", error);
-    return json({ message: "Wystąpił problem z realizacją zamówienia.", error: true });
-  }
-};
+    session.set("cart", {});
+
+    const commit = await commitSession(session);
+
+    return json(
+      { success: true },
+      {
+        headers: {
+          "Set-Cookie": commit,
+        },
+      }
+    );
+  };
 
 const SuccessPage = () => {
 

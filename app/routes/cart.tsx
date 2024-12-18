@@ -11,7 +11,6 @@ export async function getCartData(session) {
   const matchedItems = {};
   let totalPrice = 0;
 
-  // Przechodzimy przez produkty w koszyku
   for (const key in cart) {
     for (const productKey in products) {
       const uniqueKey = `${products[productKey].id}-${cart[key].sizeId}`;
@@ -36,31 +35,14 @@ export async function getCartData(session) {
           matchedItems[uniqueKey].sizeId = matchedSize.id;
           matchedItems[uniqueKey].sizeName = matchedSize.name;
           matchedItems[uniqueKey].sizePrice = matchedSize.price;
-
-          // Sprawdzenie dostępności stocku w bazie danych
-          const availableStock = matchedSize.stock;  // Załóżmy, że `stock` to pole w tabeli `size`
-          const requestedStock = cart[key].stock || 1;
-
-          // Jeśli stock w bazie wynosi 0, usuwamy produkt z koszyka
-          if (availableStock === 0) {
-            delete cart[key]; // Usuwamy produkt z koszyka
-            continue; // Przechodzimy do kolejnego produktu w koszyku
-          }
-
-          // Ustawienie stocku na minimalną wartość: dostępny stock lub wprowadzony przez użytkownika
-          matchedItems[uniqueKey].stock = Math.min(requestedStock, availableStock);
-          totalPrice += matchedSize.price * matchedItems[uniqueKey].stock;
+          totalPrice += matchedSize.price * (cart[key].stock || 1);
         }
       }
     }
   }
 
-  // Po usunięciu produktów, zapisujemy zaktualizowany koszyk w sesji
-  session.set("cart", cart);
-
   return { matchedItems, totalPrice };
 }
-
 
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
@@ -95,7 +77,7 @@ export const action: ActionFunction = async ({ request }) => {
     if (!matchedItems || Object.keys(matchedItems).length === 0) {
       return json({ error: "Koszyk jest pusty." }, { status: 400 });
     }
-
+    
     session.set("order", {
       products: Object.values(matchedItems),
       totalPrice,
