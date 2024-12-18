@@ -9,42 +9,41 @@ export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request);
   const orderData = session.get("orderData") || null;
 
-  console.log(orderData)
+  // console.log(orderData)
 
-  return null
+  // return null
 
-  // if (!orderData || Object.keys(orderData.products).length === 0) {
-  //   return json({ message: "Brak danych zamówienia.", error: true });
-  // }
+  if (!orderData || Object.keys(orderData.products).length === 0) {
+    return json({ message: "Brak danych zamówienia.", error: true });
+  }
 
-  // Zaktualizuj ilości produktów w bazie danych
-  // try {
-  //   const cartItems = orderData.products;
+  try {
+    const cartItems = orderData.products;
 
-  //   for (const item of cartItems) {
-  //     await db.size.update({
-  //       where: { id: item.sizeId },
-  //       data: {
-  //         stock: {
-  //           decrement: parseInt(item.stock, 10), // quantity musi być liczbą całkowitą
-  //         },
-  //       },
-  //     });
-  //   }
+    for (const item of cartItems) {
+      await db.size.update({
+        where: { id: item.sizeId },
+        data: {
+          stock: {
+            decrement: parseInt(item.stock, 10), // quantity musi być liczbą całkowitą
+          },
+        },
+      });
+    }
 
-  //   // Wyczyść dane zamówienia z sesji
-  //   session.set("cart", {});
-  //   session.set("orderData", {});
+    // Wyczyść dane zamówienia z sesji
+    session.set("cart", {});
+    session.set("orderData", {});
 
-  //   return redirect("/success", {
-  //     headers: {
-  //       "Set-Cookie": await commitSession(session),
-  //     },
-  //   });
-  // } catch (error) {
-  //   console.error("Błąd przy aktualizacji produktów:", error);
-  //   return json({ message: "Wystąpił problem z realizacją zamówienia.", error: true });
-  // }
+    return redirect("/success", {
+      headers: {
+        "Set-Cookie": await commitSession(session),
+      },
+    });
+  } catch (error) {
+    console.error("Błąd przy aktualizacji produktów:", error);
+    return json({ message: "Wystąpił problem z realizacją zamówienia.", error: true });
+  }
 };
 
 // Komponent SuccessPage
