@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
+import { Elements, useStripe } from '@stripe/react-stripe-js';
 import { getCartData } from "./cart";
 import { getSession, commitSession } from "../utils/session.server";
 import { json, LoaderFunction } from '@remix-run/node';
@@ -34,7 +34,7 @@ export default function Checkout() {
   const language = 'pl';          // Language, default: 'pl'
   const config = 'parcelcollect'; // Config, default: 'parcelcollect'
   const sandbox = true;          // Run as sandbox environment, default: false
-
+  
   const handlePointSelected = (point) => {
     console.log("Wybrany paczkomat:", point);
     setParcelLocker(point.name);
@@ -75,6 +75,14 @@ export default function Checkout() {
       //   items: items,
       // };
 
+      if (!stripePromise) {
+        console.error('StripePromise jest niezdefiniowane lub ma wartość null.');
+        return;
+      }
+
+      alert(stripePromise);
+
+
       const handleCheckout = async () => {
         try {
           const items = Object.values(cart).map(item => ({
@@ -113,6 +121,12 @@ export default function Checkout() {
             alert('Błąd podczas przetwarzania danych płatności. Skontaktuj się z obsługą.');
             return;
           }
+
+          if (!session || !session.id) {
+            console.error('Brak ID sesji płatności');
+            alert('Błąd podczas przetwarzania danych płatności. Skontaktuj się z obsługą.');
+            return;
+          }      
     
           // Sprawdzenie, czy sesja zawiera błąd
           if (session.error) {

@@ -11,8 +11,6 @@ export const action = async ({ req }: { req: Request }) => {
     try {
       const { items } = await req.json();
 
-      alert(items)
-
       const lineItems = items.map((item: { id: string; quantity: number; price: number }) => ({
         price_data: {
           currency: 'pln',
@@ -23,8 +21,6 @@ export const action = async ({ req }: { req: Request }) => {
         },
         quantity: item.quantity,
       }));
-
-      alert(lineItems)
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card', 'blik'],
