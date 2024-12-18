@@ -65,7 +65,7 @@ export default function Checkout() {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ items }),
+            body: JSON.stringify({ items, totalPrice }),
           });
     
           // Sprawdzenie odpowiedzi HTTP
