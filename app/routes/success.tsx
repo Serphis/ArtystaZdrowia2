@@ -29,14 +29,18 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
 
     // Wyczyść dane zamówienia z sesji
-    session.set(cart, {});
-    session.set("orderData", {});
+    if (cart && Object.keys(cart).length > 0) {
 
-    return redirect("/success", {
-      headers: {
-        "Set-Cookie": await commitSession(session),
-      },
-    });
+      session.set("cart", {});
+      session.set("orderData", {});
+
+      return redirect("/success", {
+        headers: {
+          "Set-Cookie": await commitSession(session),
+        },
+      });
+    }
+    return null;
   } catch (error) {
     console.error("Błąd przy aktualizacji produktów:", error);
     return json({ message: "Wystąpił problem z realizacją zamówienia.", error: true });
