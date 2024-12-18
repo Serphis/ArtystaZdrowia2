@@ -54,7 +54,7 @@ export default function Checkout() {
   totalPrice *= 100;
 
   const handleCheckout = async () => {
-
+    // Przygotuj dane o zamówieniu, ale nie zapisuj go jeszcze w bazie
     const orderData = {
       cart,
       totalPrice,
@@ -65,7 +65,7 @@ export default function Checkout() {
       parcelLocker,
       selectedPoint,
     };
-
+  
     try {
       // 1. Tworzymy sesję płatności na Stripe
       const items = Object.values(cart).map(item => ({
@@ -150,8 +150,7 @@ export default function Checkout() {
       console.error('Błąd podczas obsługi płatności:', error);
       alert('Wystąpił błąd podczas obsługi płatności. Spróbuj ponownie później.');
     }
-  };
-    
+  };    
 
     // const handleCheckout = async () => {
     //     const items = Object.values(cart).map(item => ({
