@@ -27,7 +27,7 @@ export default function Index() {
           <h2 className="text-l md:text-2xl lg:text-3xl text-center lg:tracking-wide p-3 sm:p-4">IDEALNY POMYSŁ NA PREZENT</h2>
         </div>
         <div className="w-36 sm:w-60 md:w-72 lg:w-96">
-          <img src="https://res.cloudinary.com/djio9fbja/image/upload/v1733048713/public/lzaavy3qk8ihcxtrucib.jpg" alt="Opis zdjęcia" className='object-cover ring-1 ring-black rounded-2xl shadow-md' />
+          <img src="https://res.cloudinary.com/djio9fbja/image/upload/v1733048713/public/lzaavy3qk8ihcxtrucib.jpg" alt="Opis zdjęcia" className='object-cover ring-1 ring-black rounded-2xl mr-4 shadow-md' />
         </div>
       </section>
 
