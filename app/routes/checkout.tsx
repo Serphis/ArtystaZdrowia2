@@ -254,6 +254,7 @@ export default function Checkout() {
                 </label> */}
                 <label>
                   <input
+                    className='bg-white'
                     type="radio"
                     name="deliveryMethod"
                     value="Kurier DPD - 18 zł"
@@ -264,6 +265,7 @@ export default function Checkout() {
                 </label>
                 <label>
                   <input
+                    className='bg-white'
                     type="radio"
                     name="deliveryMethod"
                     value="Kurier InPost - 18 zł"
@@ -293,21 +295,21 @@ export default function Checkout() {
                       type="text"
                       placeholder="Ulica"
                       value={address.street}
-                      className='ring-1 ring-slate-200 p-2 rounded-lg shadow-md'
+                      className='bg-white ring-1 ring-slate-200 p-2 rounded-lg shadow-md'
                       onChange={(e) => setAddress({ ...address, street: e.target.value })}
                     />
                     <input
                       type="text"
                       placeholder="Miasto"
                       value={address.city}
-                      className='ring-1 ring-slate-200 p-2 rounded-lg shadow-md'
+                      className='bg-white ring-1 ring-slate-200 p-2 rounded-lg shadow-md'
                       onChange={(e) => setAddress({ ...address, city: e.target.value })}
                     />
                     <input
                       type="text"
                       placeholder="Kod pocztowy"
                       value={address.zip}
-                      className='ring-1 ring-slate-200 p-2 rounded-lg shadow-md'
+                      className='bg-white ring-1 ring-slate-200 p-2 rounded-lg shadow-md'
                       onChange={(e) => setAddress({ ...address, zip: e.target.value })}
                     />
                   </div>
@@ -319,6 +321,7 @@ export default function Checkout() {
                 </h1>
                 <label>
                   <input
+                    className='bg-white'
                     type="radio"
                     name="paymentMethod"
                     value="online"
@@ -346,21 +349,21 @@ export default function Checkout() {
                   type="name"
                   placeholder="Imię i nazwisko"
                   value={customerData.name}
-                  className='ring-1 ring-slate-200 p-2 rounded-lg shadow-md'
+                  className='bg-white ring-1 ring-slate-200 p-2 rounded-lg shadow-md'
                   onChange={(e) => setCustomerData({ ...customerData, name: e.target.value })}
                 />
                 <input
                   type="email"
                   placeholder="Email"
                   value={customerData.email}
-                  className='ring-1 ring-slate-200 p-2 rounded-lg shadow-md'
+                  className='bg-white ring-1 ring-slate-200 p-2 rounded-lg shadow-md'
                   onChange={(e) => setCustomerData({ ...customerData, email: e.target.value })}
                 />
                 <input
                   type="tel"
                   placeholder="Telefon"
                   value={customerData.phone}
-                  className='ring-1 ring-slate-200 p-2 rounded-lg shadow-md'
+                  className='bg-white ring-1 ring-slate-200 p-2 rounded-lg shadow-md'
                   onChange={(e) => setCustomerData({ ...customerData, phone: e.target.value })}
                 />
               </div>

@@ -113,8 +113,8 @@ export default function Cart() {
   const isCartEmpty = !matchedItems || Object.keys(matchedItems).length === 0;
 
   return (
-    <form method="post">
-      <main className="py-4 h-screen bg-white font-light flex flex-row space-x-4 sm:space-x-12 md:space-x-20 lg:space-x-32 justify-center">
+    <form method="post" className="h-screen bg-white">
+      <main className="py-4 font-light flex flex-row space-x-4 sm:space-x-12 md:space-x-20 lg:space-x-32 justify-center">
         <div className="rounded-md p-2">
           <h1 className="text-2xl md:text-3xl lg:text-4xl tracking-widest text-center px-2 pt-4 pb-4">
             Koszyk
