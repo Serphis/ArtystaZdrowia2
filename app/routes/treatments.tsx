@@ -2,7 +2,7 @@ import { Link } from "@remix-run/react";
 
 export default function Index() {
   return (
-    <section className="bg-white w-full font-light tracking-wide p-6 mx-4 sm:mx-14 md:mx-24 lg:mx-40 xl:mx-60">
+    <section className="bg-white font-light tracking-wide p-6 px-4 sm:px-14 md:px-24 lg:px-40 xl:px-60">
         <div className="text-center flex flex-col">
             <div>
                 <h3 className="text-4xl md:text-5xl my-6 mb-6">Zabiegi fizjoterapeutyczne</h3>
