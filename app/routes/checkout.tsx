@@ -16,7 +16,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json({ cart: matchedItems, totalPrice });
 };
 
-const stripePromise = loadStripe('pk_live_51QWDzLC66ozEbyTE0hqtga4swplVB3iFeY7ju038ocGXyZ90LgN845yUsc0Hlyts30TwZCj6rIqXZflfA2cEC1qb00l8ppblSH');
+const stripePromise = loadStripe('pk_test_51QWDzLC66ozEbyTE3bWJdZCIgsFId1VpLZ35NaR67Xbn16UbxLJ9iEvYTinebp7KmbYncMmdlWRtchkGBjzuVH4o00NbPwKvop');
 
 export default function Checkout() {
 
