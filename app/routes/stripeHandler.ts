@@ -36,7 +36,7 @@ export const action = async ({ request }: { request: Request }) => {
       });      
 
       const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card', 'blik', 'przelewy24'],
+        payment_method_types: ['card', 'blik', 'p24'],
         line_items: lineItems,
         mode: 'payment',
         success_url: `${new URL('https://www.artystazdrowia.com//success', request.url)}`,
