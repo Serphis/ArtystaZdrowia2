@@ -62,13 +62,15 @@ export default function ProductInfo() {
     };
 
     return (
-        <main className="bg-white p-4 h-screen font-light">
+        <main className="bg-white p-4 h-full font-light">
             <div key={Product.id} className="w-full rounded-md">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-widest text-center p-2 pt-6">
                     {Product.name}
                 </h1>
-                <div className="flex flex-row my-6 space-x-4 sm:space-x-6 md:space-x-12 lg:space-x-16 mx-4 sm:mx-14 md:mx-16 lg:mx-30 xl:mx-40 justify-center mb-4">
-                    <img src={Product.image} alt={Product.name} className="object-cover w-40 h-full sm:w-64 md:w-80 rounded-2xl ring-1 ring-black shadow-lg" />
+                <div className="flex flex-col sm:flex-row my-6 space-x-4 sm:space-x-6 md:space-x-12 lg:space-x-16 mx-4 sm:mx-14 md:mx-16 lg:mx-30 xl:mx-40 justify-center mb-4">
+                    <div className="flex justify-center">
+                      <img src={Product.image} alt={Product.name} className="my-2 object-cover sm:object-cover sm:h-full sm:w-64 md:w-80 rounded-2xl ring-1 ring-black shadow-lg" />
+                    </div>
                     <div className="flex flex-col py-8 px-4 rounded-2xl ring-1 ring-black shadow-lg">
                         <div className="py-4">
                             <p className="px-2 lg:px-4 text-justify tracking-widest max-w-96 text-md md:text-lg md:text-2xl">
