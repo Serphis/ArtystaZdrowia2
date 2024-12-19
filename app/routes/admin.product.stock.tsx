@@ -18,18 +18,36 @@ export const action: ActionFunction = async ({ request }) => {
 
   const formData = await request.formData();
   const sizeId = formData.get('sizeId');
-  const newStock = parseInt(formData.get('stock') as string, 10);
+  const newStock = formData.get('stock');
+  const productId = formData.get('productId');
+  const newDescription = formData.get('description');
 
-  if (!sizeId || isNaN(newStock)) {
-    return json({ error: 'Nieprawidłowe dane wejściowe' }, { status: 400 });
+  if (productId && typeof newDescription === 'string') {
+    await db.product.update({
+      where: { id: productId as string },
+      data: { description: newDescription },
+    });
+
+    return redirect('/admin/product/stock');
   }
 
-  await db.size.update({
-    where: { id: sizeId as string },
-    data: { stock: newStock },
-  });
 
-  return redirect('/admin/product/stock');
+  if (sizeId && newStock !== null) {
+    const parsedStock = parseInt(newStock as string, 10);
+
+    if (isNaN(parsedStock)) {
+      return json({ error: 'Nieprawidłowe dane wejściowe' }, { status: 400 });
+    }
+
+    await db.size.update({
+      where: { id: sizeId as string },
+      data: { stock: parsedStock },
+    });
+
+    return redirect('/admin/product/stock');
+  }
+
+  return json({ error: 'Nieprawidłowe dane wejściowe' }, { status: 400 });
 };
 export default function AdminProductList() {
     const { products } = useLoaderData();
@@ -44,12 +62,30 @@ export default function AdminProductList() {
             {products.map((product: any) => (
               <div key={product.id} className="flex flex-row border p-4">
                 <div className="flex flex-col">
-                    <h2 className="text-xl font-medium">{product.name}</h2>
-                    <div className="items-center">
-                        <div className="mx-3 pt-3 pb-2">
-                            <img src={product.image} alt="Opis zdjęcia" className='w-32 h-32 object-cover rounded-lg ring-1 ring-black' />
-                        </div>
+                  <h2 className="text-xl font-medium">{product.name}</h2>
+                  <div className="items-center">
+                    <div className="mx-3 pt-3 pb-2">
+                      <img
+                        src={product.image}
+                        alt="Opis zdjęcia"
+                        className="w-32 h-32 object-cover rounded-lg ring-1 ring-black"
+                      />
                     </div>
+                  </div>
+                  <Form method="post" className="flex flex-col gap-2 mt-4">
+                    <input type="hidden" name="productId" value={product.id} />
+                    <textarea
+                      name="description"
+                      defaultValue={product.description || ''}
+                      className="border rounded px-2 py-1 w-full h-20"
+                    ></textarea>
+                    <button
+                      type="submit"
+                      className="px-4 py-1 bg-slate-200 text-black hover:bg-slate-800 hover:text-white"
+                    >
+                      Zapisz opis
+                    </button>
+                  </Form>
                 </div>
                 <div className="mt-4">
                   {product.sizes.map((size: any) => (
@@ -57,8 +93,10 @@ export default function AdminProductList() {
                       <span className="w-20">{size.name}</span>
                       <span
                         className={`w-20 ${size.stock === 0 || size.stock === undefined ? 'text-red-500 font-bold' : 'text-gray-600'}`}
-                        >
-                        {size.stock === 0 || size.stock === undefined ? '0' : `Obecny stan: ${size.stock}`}
+                      >
+                        {size.stock === 0 || size.stock === undefined
+                          ? '0'
+                          : `Obecny stan: ${size.stock}`}
                       </span>
                       <Form method="post" className="flex items-center gap-2">
                         <input type="hidden" name="sizeId" value={size.id} />
@@ -71,7 +109,7 @@ export default function AdminProductList() {
                         />
                         <button
                           type="submit"
-                          className="px-4 py-1 bg-slate-500 text-white hover:bg-slate-600"
+                          className="px-4 py-1 bg-slate-200 text-black hover:bg-slate-800 hover:text-white"
                         >
                           Zapisz
                         </button>
@@ -86,4 +124,3 @@ export default function AdminProductList() {
       </main>
     );
   }
-  
