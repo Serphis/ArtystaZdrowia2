@@ -67,7 +67,7 @@ export default function ProductInfo() {
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-widest text-center p-2 pt-6">
                     {Product.name}
                 </h1>
-                <div className="flex flex-col sm:flex-row my-6 space-x-4 sm:space-x-6 md:space-x-12 lg:space-x-16 mx-4 sm:mx-14 md:mx-16 lg:mx-30 xl:mx-40 justify-center mb-4">
+                <div className="flex flex-col sm:flex-row my-6 space-x-4 sm:space-x-6 md:space-x-12 lg:space-x-16 sm:mx-14 md:mx-16 lg:mx-30 xl:mx-40 justify-center mb-4">
                     <div className="flex justify-center">
                       <img src={Product.image} alt={Product.name} className="my-2 object-cover sm:object-cover sm:h-full sm:w-64 md:w-80 rounded-2xl ring-1 ring-black shadow-lg" />
                     </div>
