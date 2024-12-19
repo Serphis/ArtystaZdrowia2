@@ -82,13 +82,8 @@ export default function ProductInfo() {
                                 <input type="hidden" name="productId" value={Product.id} />
                                 
                                 {AvailableSizes.length > 0 ? (
-                                <div>
-                                    <div className="flex justify-center pt-8">
-                                        <label htmlFor="size" className="font-light tracking-widest">
-                                            Wybierz rozmiar
-                                        </label>
-                                    </div>
-                                    <div className="flex justify-center">
+                                <div className="p-8">
+                                    <div className="flex justify-center pt-10">
                                         <select
                                             id="size"
                                             name="size"
