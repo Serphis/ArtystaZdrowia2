@@ -10,6 +10,8 @@ export const action = async ({ request }: { request: Request }) => {
   if (request.method === 'POST') {
     try {
       const { items } = await request.json();
+
+      const shippingCost = 1800;
   
       const lineItems = items.map((item: { id: string; quantity: number; price: number }) => ({
         price_data: {
@@ -21,6 +23,17 @@ export const action = async ({ request }: { request: Request }) => {
         },
         quantity: item.quantity,
       }));
+
+      lineItems.push({
+        price_data: {
+          currency: 'pln',
+          product_data: {
+            name: 'Koszt przesyłki',
+          },
+          unit_amount: shippingCost,
+        },
+        quantity: 1,
+      });      
 
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card', 'blik'],

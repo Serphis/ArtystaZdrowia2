@@ -22,7 +22,7 @@ export default function Checkout() {
 
   let { cart, totalPrice } = useLoaderData();
 
-  const [deliveryMethod, setDeliveryMethod] = useState('Kurier InPost');
+  const [deliveryMethod, setDeliveryMethod] = useState('Kurier InPost - 18 zł');
   const [paymentMethod, setPaymentMethod] = useState('online');
   const [parcelLocker, setParcelLocker] = useState<string | null>(null);
   const [customerData, setCustomerData] = useState({ name: '', email: '', phone: '' });
@@ -256,21 +256,21 @@ export default function Checkout() {
                   <input
                     type="radio"
                     name="deliveryMethod"
-                    value="Kurier DPD"
-                    checked={deliveryMethod === 'Kurier DPD'}
-                    onChange={() => setDeliveryMethod('Kurier DPD')}
+                    value="Kurier DPD - 18 zł"
+                    checked={deliveryMethod === 'Kurier DPD - 18 zł'}
+                    onChange={() => setDeliveryMethod('Kurier DPD - 18 zł')}
                   />
-                  Kurier DPD
+                  Kurier DPD - 18 zł
                 </label>
                 <label>
                   <input
                     type="radio"
                     name="deliveryMethod"
-                    value="Kurier InPost"
-                    checked={deliveryMethod === 'Kurier InPost'}
-                    onChange={() => setDeliveryMethod('Kurier InPost')}
+                    value="Kurier InPost - 18 zł"
+                    checked={deliveryMethod === 'Kurier InPost - 18 zł'}
+                    onChange={() => setDeliveryMethod('Kurier InPost - 18 zł')}
                   />
-                  Kurier InPost
+                  Kurier InPost - 18 zł
                 </label>
                 {deliveryMethod === 'Paczkomat' && (
                   <div style={{ height: '500px' }} className='py-2'>
@@ -284,7 +284,7 @@ export default function Checkout() {
                 )}
                 {/* Możliwość wyboru innych metod */}
 
-                {['Kurier DPD', 'Kurier InPost'].includes(deliveryMethod) && (
+                {['Kurier DPD - 18 zł', 'Kurier InPost - 18 zł'].includes(deliveryMethod) && (
                   <div className='flex flex-col space-y-3'>
                     <h1 className="text-2xl md:text-3xl tracking-widest text-center pt-5">
                       Adres dostawy
