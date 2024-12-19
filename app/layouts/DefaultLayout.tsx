@@ -50,7 +50,7 @@ const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           }
         </div>
 
-        <nav className="bg-white flex flex-wrap justify-center space-x-2 md:space-x-6 py-2 p-1 sm:p-2 text-xs md:text-base font-light tracking-widest">
+        <nav className="bg-white text-black flex flex-wrap justify-center space-x-2 md:space-x-6 py-2 p-1 sm:p-2 text-xs md:text-base font-light tracking-widest">
           <Link to="/" className="group transition duration-300">
             Strona główna
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-black"></span>
