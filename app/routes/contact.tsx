@@ -18,7 +18,7 @@ export default function Index() {
 
     return (
         <form onSubmit={handleSubmit}>
-            <div className="bg-white font-light tracking-wide">
+            <div className="bg-white w-full h-screen font-light tracking-wide">
                 <section className="text-center py-8 flex flex-col items-center">
                     <h2 className="text-4xl md:text-5xl text-center p-1">Kontakt</h2>
                     <h2 className="text-xl font-light p-2">

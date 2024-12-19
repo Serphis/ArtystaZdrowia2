@@ -62,7 +62,7 @@ export default function ProductInfo() {
     };
 
     return (
-        <main className="h-screen font-light">
+        <main className="bg-white p-4 h-screen font-light">
             <div key={Product.id} className="w-full rounded-md">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl tracking-widest text-center p-2 pt-6">
                     {Product.name}
