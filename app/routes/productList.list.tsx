@@ -23,7 +23,7 @@ export default function ProductList(){
     return (
       <main className="font-serif">
         <form method="post">
-          <div className="p-8 w-full rounded-md bg-white">
+          <div className="p-8 w-full bg-white">
             <h1 className="text-3xl flex justify-center font-light tracking-widest">
               Nasze produkty
             </h1>
