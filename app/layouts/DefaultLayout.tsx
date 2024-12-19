@@ -90,6 +90,7 @@ const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         className="flex justify-between items-center p-4 bg-[#7b6b63] text-[#f2e4ca] text-xs font-light"
       >
         <p>O nas</p>
+        <p><Link to="/rules">Regulamin</Link></p>
         <p>Pomoc</p>
       </footer>
     </div>
