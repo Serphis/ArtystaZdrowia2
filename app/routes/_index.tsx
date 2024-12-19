@@ -22,9 +22,9 @@ export default function Index() {
     <div className="bg-white font-light tracking-widest">
       <section className="text-center pt-12 flex flex-row justify-center">
         <div className="p-2 sm:py-8 flex flex-col sm:mr-12 lg:mr-28 xl:mr-40">
-          <h2 className="text-2xl md:text-4xl lg:text-5xl text-center lg:tracking-wide p-4 sm:p-4 mb-2 sm:mb-10 lg:mb-32">RĘCZNIE ROBIONE</h2>
-          <h2 className="text-xl md:text-3xl lg:text-4xl text-center lg:tracking-wide p-4 sm:p-4 mb-2 sm:mb-10 lg:mb-24">W DOMOWYM ZACISZU</h2>
-          <h2 className="text-l md:text-2xl lg:text-3xl text-center lg:tracking-wide p-3 sm:p-4">IDEALNY POMYSŁ NA PREZENT</h2>
+          <h2 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl text-center lg:tracking-wide p-2 sm:p-4 mb-2 sm:mb-10 lg:mb-32">RĘCZNIE ROBIONE</h2>
+          <h2 className="text-lg sm:text-xl md:text-3xl lg:text-4xl text-center lg:tracking-wide p-2 sm:p-4 mb-2 sm:mb-10 lg:mb-24">W DOMOWYM ZACISZU</h2>
+          <h2 className="text-base sm:text-l md:text-2xl lg:text-3xl text-center lg:tracking-wide p-2 sm:p-4">IDEALNY POMYSŁ NA PREZENT</h2>
         </div>
         <div className="w-36 sm:w-60 md:w-72 lg:w-96">
           <img src="https://res.cloudinary.com/djio9fbja/image/upload/v1733048713/public/lzaavy3qk8ihcxtrucib.jpg" alt="Opis zdjęcia" className='object-cover ring-1 ring-black rounded-2xl mr-4 shadow-md' />

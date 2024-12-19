@@ -2,7 +2,7 @@ import { Link } from "@remix-run/react";
 
 export default function Index() {
   return (
-    <section className="bg-white w-full font-light tracking-wide mx-4 sm:mx-14 md:mx-36 lg:mx-56 xl:mx-80">
+    <section className="bg-white w-screen font-light tracking-wide mx-4 sm:mx-14 md:mx-36 lg:mx-56 xl:mx-80">
         <div className="text-center flex flex-col">
             <h2 className="text-5xl text-center my-10 mb-12">O firmie</h2>
             <div>
