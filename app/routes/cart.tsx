@@ -114,7 +114,7 @@ export default function Cart() {
 
   return (
     <form method="post">
-      <main className="py-4 bg-white font-light flex flex-row space-x-4 sm:space-x-12 md:space-x-20 lg:space-x-32 justify-center">
+      <main className="py-4 h-full bg-white font-light flex flex-row space-x-4 sm:space-x-12 md:space-x-20 lg:space-x-32 justify-center">
         <div className="rounded-md p-2">
           <h1 className="text-2xl md:text-3xl lg:text-4xl tracking-widest text-center px-2 pt-4 pb-4">
             Koszyk
