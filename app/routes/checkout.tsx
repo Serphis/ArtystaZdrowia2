@@ -205,10 +205,10 @@ export default function Checkout() {
 
   return (
     <Elements stripe={stripePromise}>
-      <h1 className="h-screen bg-white text-2xl md:text-3xl lg:text-4xl font-light tracking-widest text-center px-2 pt-8 pb-4">
+      <h1 className="bg-white text-2xl md:text-3xl lg:text-4xl font-light tracking-widest text-center px-2 pt-8 pb-4">
           Podsumowanie zamówienia
       </h1>
-      <div className="py-4 bg-white font-light tracking-widest flex flex-row justify-center">
+      <div className="w-full py-4 bg-white font-light tracking-widest flex flex-row justify-center">
         <div className="flex flex-row space-x-4 sm:space-x-6 md:space-x-12 lg:space-x-16">
           <div className='mx-1'>
             <h1 className="text-2xl md:text-3xl tracking-widest text-center px-2 pt-4 pb-4">
