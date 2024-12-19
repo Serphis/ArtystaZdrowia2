@@ -88,7 +88,7 @@ export default function ProductInfo() {
                                             id="size"
                                             name="size"
                                             onChange={handleSizeChange}
-                                            className="ring-1 ring-black shadow-md rounded p-2 w-40"
+                                            className="ring-1 ring-black bg-white shadow-md rounded p-2 w-40"
                                         >
                                             {AvailableSizes.map((size) => (
                                             <option key={size.id} value={size.id}>

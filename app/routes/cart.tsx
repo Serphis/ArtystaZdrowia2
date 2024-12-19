@@ -179,7 +179,7 @@ export default function Cart() {
               </div>        
             </div>
           ) : (
-            <p className="text-center tracking-widest mt-6">
+            <p className="text-center h-screen tracking-widest mt-6">
               {message || "Twój koszyk jest pusty."}
             </p>
           )}
