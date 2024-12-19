@@ -87,28 +87,8 @@ export default function AdminProductList() {
         <div className="flex flex-col gap-8 rounded-md bg-gray-50">
           {products.map((product: any) => (
             <div key={product.id} className="flex flex-row border p-4">
-              <div className="flex flex-col">
-                <Form method="post" className="flex flex-col gap-2">
-                  <input type="hidden" name="productId" value={product.id} />
-                  <input
-                    type="text"
-                    name="productName"
-                    defaultValue={product.name}
-                    className="border rounded px-2 py-1 w-full"
-                  />
-                  <textarea
-                    name="description"
-                    defaultValue={product.description || ''}
-                    className="border rounded px-2 py-1 w-full h-20"
-                  ></textarea>
-                  <button
-                    type="submit"
-                    className="px-4 py-1 bg-slate-200 text-black hover:bg-slate-800 hover:text-white"
-                  >
-                    Zapisz zmiany
-                  </button>
-                </Form>
-                <div className="items-center">
+              <div className="flex flex-row">
+              <div className="items-center">
                   <div className="mx-3 pt-3 pb-2">
                     <img
                       src={product.image}
@@ -117,33 +97,69 @@ export default function AdminProductList() {
                     />
                   </div>
                 </div>
+                <Form method="post" className="flex flex-row gap-2">
+                  <div>
+                    <input type="hidden" name="productId" value={product.id} />
+                    <div>Nazwa produktu</div>
+                    <input
+                      type="text"
+                      name="productName"
+                      defaultValue={product.name}
+                      className="border rounded px-2 py-1 w-full"
+                    />
+                    <div>Opis</div>
+                    <textarea
+                      name="description"
+                      defaultValue={product.description || ''}
+                      className="border rounded px-2 py-1 w-full h-20"
+                    ></textarea>
+                    <button
+                      type="submit"
+                      className="px-4 py-1 bg-slate-200 text-black hover:bg-slate-800 hover:text-white"
+                    >
+                      Zapisz zmiany
+                    </button>
+                  </div>
+                </Form>
               </div>
               <div className="mt-4">
                 {product.sizes.map((size: any) => (
                   <div key={size.id} className="flex flex-col gap-2 py-2">
-                    <Form method="post" className="flex items-center gap-2">
+                    <Form method="post" className="flex items-center gap-2 px-2">
                       <input type="hidden" name="sizeId" value={size.id} />
-                      <input
-                        type="text"
-                        name="sizeName"
-                        defaultValue={size.name}
-                        className="border rounded px-2 py-1 w-20"
-                      />
-                      <input
-                        type="number"
-                        name="stock"
-                        min="0"
-                        defaultValue={size.stock}
-                        className="border rounded px-2 py-1 w-12"
-                      />
-                      <input
-                        type="number"
-                        name="price"
-                        min="0"
-                        step="0.01"
-                        defaultValue={size.price}
-                        className="border rounded px-2 py-1 w-16"
-                      />
+                      <div>
+                        <div className="text-sm">Rodzaje/rozmiary</div>
+                        <input
+                          type="text"
+                          name="sizeName"
+                          defaultValue={size.name}
+                          className="border rounded px-2 py-1 w-20"
+                        />
+                      </div>
+
+                      <div>
+                        <div className="text-sm">Ilość</div>
+                          <input
+                            type="number"
+                            name="stock"
+                            min="0"
+                            defaultValue={size.stock}
+                            className="border rounded px-2 py-1 w-12"
+                          />
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm">Cena</div>
+                        <input
+                          type="number"
+                          name="price"
+                          min="0"
+                          step="1"
+                          defaultValue={size.price}
+                          className="border rounded px-2 py-1 w-16"
+                        />
+                      </div>
+                      
                       <button
                         type="submit"
                         className="px-4 py-1 bg-slate-200 text-black hover:bg-slate-800 hover:text-white"
