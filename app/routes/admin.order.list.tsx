@@ -4,8 +4,11 @@ import { LoaderFunction, json } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import { db } from '../services/index'; // Upewnij się, że masz dostęp do swojego db
 import { Link } from 'react-router-dom';
+import { requireAdmin } from '../utils/auth.server'; 
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
+  await requireAdmin(request);
+
   const orders = await db.order.findMany({
     include: {
       products: {
@@ -37,7 +40,7 @@ export default function OrderList() {
               <div className="flex flex-row flex-wrap justify-center gap-5">
                 {validOrders.map((order) => (
                   <div key={order.id}>
-                    <div className="flex flex-col w-60 md:w-80 ">
+                    <div className="flex flex-col w-60 md:w-80 ring-1 ring-black rounded-lg">
                       <Link
                         to={`/admin/order/${order.id}`}
                         className="transition duration-500 ease-in-out hover:bg-slate-100 hover:text-slate-800 font-medium p-1 pb-2 rounded-2xl"

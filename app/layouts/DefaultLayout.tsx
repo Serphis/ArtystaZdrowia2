@@ -41,12 +41,12 @@ const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <HandleLogin userId={userId} />
             <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 rounded-lg bg-[#f2e4ca]"></span>
           </div>
-          {isAdmin && (
-            <Link to="/admin/product/stock" className="group text-[#f2e4ca] transition duration-300 text-sm sm:text-base lg:text-base">
-              ZARZĄDZAJ
-              <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-[#f2e4ca] rounded-lg"></span>
-            </Link>
-          )} */
+          // {isAdmin && (
+          //   <Link to="/admin/product/stock" className="group text-[#f2e4ca] transition duration-300 text-sm sm:text-base lg:text-base">
+          //     ZARZĄDZAJ
+          //     <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-[#f2e4ca] rounded-lg"></span>
+          //   </Link>
+          // )} */
           }
         </div>
 

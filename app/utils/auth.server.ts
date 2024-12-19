@@ -78,5 +78,15 @@ export async function requireAdmin(request: Request) {
   return userSession;
 }
 
+export async function checkAdmin(request: Request) {
+  const userSession = await getUserSession(request);
+
+  if (userSession && userSession.userId && userSession.isAdmin === true) {
+    return true;
+  }
+
+  return false;
+}
+
 
 export { authenticator };
