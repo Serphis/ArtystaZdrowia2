@@ -37,7 +37,7 @@ export default function Index() {
 
       <section className="text-center px-4 flex flex-col items-center justify-center">
         <h2 className="text-3xl font-light tracking-widest p-6">Jesteśmy dumni z naszego zobowiązania do ochrony naszej planety</h2>
-        <h2 className="text-2xl font-light tracking-widest p-2 sm:p-6 sm:w-4/5 lg:w-3/5">Każdy krok w procesie produkcji starannie przemyślany. Nasze materiały pochodzą z ekologicznych źródeł, a nasza produkcja jest zoptymalizowana pod kątem redukcji odpadów i zużycia wody.</h2>
+        <h2 className="text-2xl font-light tracking-widest p-2 sm:p-6 sm:w-4/5 lg:w-3/5">Każdy krok w procesie produkcji jest starannie przemyślany. Nasze materiały pochodzą z ekologicznych źródeł, a nasza produkcja jest zoptymalizowana pod kątem redukcji odpadów i zużycia wody.</h2>
         <h2 className="text-4xl font-light tracking-widest p-6 flex flex-row">
           Eco-Friendly Materiały
           <img src="https://res.cloudinary.com/djio9fbja/image/upload/v1733249828/public/ecoleaf.png" alt="Opis zdjęcia" className='h-10 pl-4 object-cover opacity-70' />
