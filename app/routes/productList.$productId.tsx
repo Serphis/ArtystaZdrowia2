@@ -69,7 +69,7 @@ export default function ProductInfo() {
                 </h1>
                 <div className="flex flex-row my-6 space-x-4 sm:space-x-6 md:space-x-12 lg:space-x-16 mx-4 sm:mx-14 md:mx-16 lg:mx-30 xl:mx-40 justify-center mb-4">
                     <img src={Product.image} alt={Product.name} className="object-cover w-52 sm:w-64 md:w-80 rounded-2xl ring-1 ring-black shadow-lg" />
-                    <div className="flex flex-col py-8 rounded-2xl ring-1 ring-black shadow-lg">
+                    <div className="flex flex-col py-8 px-4 rounded-2xl ring-1 ring-black shadow-lg">
                         <div className="py-4">
                             <p className="px-8 md:px-12 text-justify tracking-widest max-w-96 text-md md:text-lg md:text-2xl">
                                 {Product.description}
@@ -98,7 +98,7 @@ export default function ProductInfo() {
                                         </select>
                                     </div>
                                     <div className="flex justify-center">
-                                        <label htmlFor="stock" className="block text-sm font-light tracking-widest pt-4 pb-1">
+                                        <label htmlFor="stock" className="block text-sm font-light bg-white tracking-widest mt-4 mb-1">
                                             Ilość
                                         </label>
                                     </div>
@@ -114,7 +114,7 @@ export default function ProductInfo() {
                                                 const value = Math.min(Number(e.target.value), selectedSizeData?.stock || 0); // Zapobiega przekroczeniu maksymalnego stocku
                                                 setStock(value);
                                             }}                                    
-                                            className="rounded p-1 w-12 text-center ring-1 ring-black shadow-md"
+                                            className="rounded p-1 w-12 text-center ring-1 bg-white ring-black shadow-md"
                                         />
                                     </div>
                                     <div className="flex justify-center pt-4 md:pt-6">
