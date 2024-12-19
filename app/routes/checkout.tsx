@@ -209,7 +209,7 @@ export default function Checkout() {
           Podsumowanie zamówienia
       </h1>
       <div className="w-full py-4 bg-white font-light tracking-widest flex flex-row justify-center">
-        <div className="flex flex-row space-x-4 sm:space-x-6 md:space-x-12 lg:space-x-16">
+        <div className="flex flex-col sm:flex-row space-x-4 sm:space-x-6 md:space-x-12 lg:space-x-16">
           <div className='mx-1'>
             <h1 className="text-2xl md:text-3xl tracking-widest text-center px-2 pt-4 pb-4">
               Twój koszyk
