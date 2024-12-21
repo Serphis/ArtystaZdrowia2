@@ -57,6 +57,9 @@ export default function OrderList() {
                         <div className="text-center text-sm py-1 px-2">
                           Łączna cena: {order.totalPrice/100} PLN
                         </div>
+                        <div className="text-center text-sm py-1 px-2">
+                          Status zamówienia: {order.status}
+                        </div>
                       </Link>
                     </div>
                   </div>
