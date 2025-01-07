@@ -1,7 +1,7 @@
 // app/routes/admin/order/$orderId.tsx
 
 import { ActionFunction, LoaderFunction, json } from '@remix-run/node';
-import { Form, useLoaderData } from '@remix-run/react';
+import { Form, Link, useLoaderData } from '@remix-run/react';
 import { db } from '../services/index'; // Upewnij się, że masz dostęp do swojego db
 import { requireAdmin } from '../utils/auth.server'; 
 
@@ -66,10 +66,17 @@ export default function OrderDetails() {
 
   return (
     <main className="font-serif">
-      <div className="p-8 w-full rounded-md bg-white px-2 sm:px-20 md:px-40 lg:px-60 xl:px-80">
-        <h1 className="text-3xl flex justify-center font-light tracking-widest">
-          Szczegóły Zamówienia {order.id}
-        </h1>
+      <div className="p-8 rounded-md bg-white px-2 sm:px-20 md:px-40 lg:px-60 xl:px-80">
+        <div className="flex flex-row items-center">
+          <h1 className="text-3xl flex justify-center font-light tracking-widest">
+            Szczegóły Zamówienia {order.id}
+          </h1>
+          <h1>
+            <Link to={`/admin/order/list`} className="p-4 bg-slate-200 text-black rounded hover:text-white hover:bg-slate-800">
+              Powrót
+            </Link>
+          </h1>
+        </div>
         <div className="py-8">
           <div className="space-y-4">
             <div>

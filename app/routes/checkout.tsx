@@ -5,7 +5,7 @@ import { getCartData } from "./cart";
 import { getSession, commitSession } from "../utils/session.server";
 import { json, LoaderFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
-import { InpostGeowidgetReact } from 'inpost-geowidget-react'
+// import { InpostGeowidgetReact } from 'inpost-geowidget-react'
 
 
 export const loader: LoaderFunction = async ({ request }) => {

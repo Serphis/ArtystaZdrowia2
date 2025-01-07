@@ -10,6 +10,7 @@ import type { LinksFunction } from "@remix-run/node";
 import "./tailwind.css";
 import DefaultLayout from "./layouts/DefaultLayout";
 import {} from 'dotenv/config'
+import CookieConsent from "./components/cookieconsent";
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -54,6 +55,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <DefaultLayout>
           {children}
+          <CookieConsent />
           <ScrollRestoration />
           <Scripts />
           <LiveReload />
