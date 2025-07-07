@@ -58,7 +58,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <CookieConsent />
           <ScrollRestoration />
           <Scripts />
-          <LiveReload />
         </DefaultLayout>
       </body>
     </html>

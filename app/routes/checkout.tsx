@@ -68,24 +68,24 @@ export default function Checkout() {
 
     localStorage.setItem('orderData', JSON.stringify(orderData));
 
-    try {
-      const response = await fetch('https://www.artystazdrowia.com/databaseHandler', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData),
-      });
+    // try {
+    //   const response = await fetch('https://www.artystazdrowia.com/databaseHandler', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(orderData),
+    //   });
   
-        const result = await response.json();
-        if (result.status === 'success') {
-          console.log('Zamówienie zostało złożone:', result.orderId);
-        } else {
-          console.error('Błąd składania zamówienia:', result.message);
-        }
-    } catch (error) {
-      console.error('Błąd połączenia:', error);
-    }
+    //     const result = await response.json();
+    //     if (result.status === 'success') {
+    //       console.log('Zamówienie zostało złożone:', result.orderId);
+    //     } else {
+    //       console.error('Błąd składania zamówienia:', result.message);
+    //     }
+    // } catch (error) {
+    //   console.error('Błąd połączenia:', error);
+    // }
 
     try {
       const items = Object.values(cart).map(item => ({
