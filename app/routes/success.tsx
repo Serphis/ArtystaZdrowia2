@@ -12,20 +12,18 @@ export const loader: LoaderFunction = async ({ request }) => {
     return json({ message: "Brak danych zamówienia.", error: true });
   }
 
-    // const cartItems = orderData.products;
+    const cartItems = orderData.products;
 
-    // for (const item of cartItems) {
-    //   await db.size.update({
-    //     where: { id: item.sizeId },
-    //     data: {
-    //       stock: {
-    //         decrement: parseInt(item.stock, 10), // ilość musi być liczbą całkowitą
-    //       },
-    //     },
-    //   });
-    // }
-    
-    console.log(orderData)
+    for (const item of cartItems) {
+      await db.size.update({
+        where: { id: item.sizeId },
+        data: {
+          stock: {
+            decrement: parseInt(item.stock, 10), // ilość musi być liczbą całkowitą
+          },
+        },
+      });
+    }
 
     session.set("cart", {});
 
